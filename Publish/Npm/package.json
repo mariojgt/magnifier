@@ -1,0 +1,33 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "watch": "npx mix watch",
+        "watch-poll": "npm run watch -- --watch-poll",
+        "hot": "npx mix watch --hot",
+        "prod": "npm run production",
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --config=node_modules/laravel-mix/setup/webpack.config.js"
+    },
+    "devDependencies": {
+        "@vue/compiler-sfc": "^3.0.5",
+        "axios": "^0.21.1",
+        "cross-env": "^7.0",
+        "laravel-mix": "^6.0.10",
+        "lodash": "^4.17.19",
+        "popper.js": "^1.12",
+        "postcss": "^8.2.4",
+        "resolve-url-loader": "^2.3.1",
+        "sass": "^1.32.4",
+        "sass-loader": "^8.0.0",
+        "vue-loader": "^16.0.0-rc.1"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.2",
+        "feather-icons": "^4.28.0",
+        "sweetalert2": "^9.17.2",
+        "tailwindcss": "^2.0.1",
+        "toastify-js": "^1.9.3",
+        "vue": "^3.0.5"
+    }
+}

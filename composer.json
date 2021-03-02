@@ -1,0 +1,39 @@
+{
+    "name": "mariojgt/magnifier",
+    "description": "A Laravel Package Magnifier, a quick start for new laravel Packages",
+    "keywords": [
+        "laravel"
+    ],
+    "type": "laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mario",
+            "email": "mariojgt2@gmail.com"
+        }
+    ],
+    "require":{
+        "php": "^7.3|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mariojgt\\Magnifier\\": "src"
+        }
+    },
+
+    "scripts": {
+        "post-autoload-dump": [
+            "@php artisan route:list"
+        ]
+    },
+
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mariojgt\\Magnifier\\MagnifierProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
