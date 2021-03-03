@@ -1,5 +1,6 @@
 # Magnifier
-This Laravel packages contain a very simple structure for any kind of packages development for Laravel.
+
+A laravel media manager easy to use an integrate.
 
 # Features
 
@@ -13,55 +14,3 @@ This Laravel packages contain a very simple structure for any kind of packages d
 - [ ] Dynamic form
 - [ ] Lightweight
 - [ ] Dark|light mode out of the box
-
-# Installation
-
-You have 2 options.
-
-### First option via composer
-
-1. composer require mariojgt/magnifier
-2. php artsain vendor:publish --force  (select the package number)
-
-### Second Option gitclone (Recommended if you like to change and make to your own)
-
-1. git clone https://github.com/mariojgt/magnifier
-
-2. Setup you composer to use local VCS
-
-3. ```javascript
-   "repositories": [
-           {
-               "type" : "path",
-               "url": "packages/magnifier", // Path to your local folder package
-               "options": {
-                   "symlink": true
-               }
-           }
-       ],
-       "require": {
-           "php": "^7.3|^8.0", //Example
-           "fideloper/proxy": "^4.4",//Example
-           "fruitcake/laravel-cors": "^2.0",//Example
-           "guzzlehttp/guzzle": "^7.0.1",//Example
-           "laravel/framework": "^8.12",//Example
-           "laravel/tinker": "^2.5",//Example
-           "mariojgt/magnifier": "@dev"// Here is where you add the package reference
-       },
-   ```
-
-4. php artsain vendor:publish --force  (select the package number)
-
-## Command Republish
-
-The following commands
-
-```php
-php artisan republish:magnifier
-```
-
-Will move you changes in your resources like the js or css back to the packages useful to speed up development.
-
-# Packages info
-
-This package purpose is to give a fresh start for a new package so you can use those premade tools or just delete and use the package magnifier.
