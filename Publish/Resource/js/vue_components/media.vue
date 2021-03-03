@@ -10,11 +10,19 @@
                         <add-folder @load_folder="reloadFolder"></add-folder>
                     </div>
                 </div>
+
+                <breadcrumb
+                    @load_root="loadParents"
+                    @load_selected_folder="loadFolder"
+                >
+                </breadcrumb>
+
                 <!-- end header -->
                 <sidebar
                     v-for="(item, index) in folders" :key="index"
                     v-bind:item="item"
                     @load_folder="reloadFolder"
+                    @load_selected_folder="loadSelectedFolder"
                 ></sidebar>
             </div>
             <!-- end right section -->
@@ -84,7 +92,14 @@
         },
         methods: {
             reloadFolder(value) {
-                this.loadParents();
+                if (value === 'parent') {
+                    this.loadParents();
+                } else {
+                    this.loadFolder(value.id);
+                }
+            },
+            loadSelectedFolder (item) {
+                this.loadFolder(item.id);
             },
             loadParents() {
                 axios.get('folder/list', {
@@ -94,7 +109,17 @@
                 })
                 .catch(function (error) {
                 })
-            }
+            },
+            loadFolder(id) {
+                axios.get('/folder/load/'+id, {
+                })
+                .then(response => {
+                    this.folders = response.data.data;
+                })
+                .catch(function (error) {
+                })
+            },
+
         },
         created() {},
         computed: {},

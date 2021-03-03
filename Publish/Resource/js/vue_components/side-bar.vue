@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full items-center flex">
+                <div class="w-full items-center flex" @click="loadRequest" >
                     <div class="mx-2 -mt-1  ">{{ item.name }}
                         <div class="text-xs truncate w-full normal-case font-normal -mt-1 text-gray-500">
                             soemthing here
@@ -60,7 +60,7 @@
     export default {
       name: "example",
       props: {
-        item: [],
+        item: Object,
       },
       data: function() {
         return {
@@ -69,7 +69,10 @@
       },
       methods: {
           reloadFolder (value) {
-                this.$emit('load_folder', 'mario rocks');
+                this.$emit('load_folder', this.item);
+          },
+          loadRequest () {
+            this.$emit('load_selected_folder', this.item);
           }
       },
       created() {},

@@ -9,6 +9,7 @@ import mediacontent from "./vue_components/media-content.vue";
 import addfolder from "./vue_components/add-folder.vue";
 import media from "./vue_components/media.vue";
 import icon from "./vue_components/icon";
+import breadcrumb from "./vue_components/breadcrumb";
 
 
 const el = document.getElementById('app');
@@ -44,5 +45,6 @@ app.component('media-content', mediacontent);
 app.component('add-folder', addfolder);
 app.component('media', media);
 app.component('icon', icon);
+app.component('breadcrumb', breadcrumb);
 
 app.mount(el);

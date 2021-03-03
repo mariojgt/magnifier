@@ -135,9 +135,8 @@ class MediaFolderController extends Controller
         ]);
     }
 
-    public function folderChildren($id)
+    public function folderChildren(MediaFolder $folder)
     {
-        $folder = MediaFolder::findOrFail($id);
         $children = $folder->children();
 
         return response()->json([

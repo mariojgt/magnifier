@@ -83,8 +83,7 @@
                     parent_id: this.parent_id
                 })
                 .then(function (response) {
-                    console.log('response');
-                    // this.$emit('load_folder', 1);
+
                 })
                 .catch(error => {
                   if (error.response) {
@@ -93,6 +92,7 @@
                         }
                     }
               });
+                this.$emit('load_folder', 'parent');
             }
         },
         created() {},
