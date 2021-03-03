@@ -39,11 +39,11 @@
                             </div>
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                    Deactivate account
+                                    Delete Folder
                                 </h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500">
-                                        Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.
+                                        Delete a folder will delete all the subfolder and files this action is not reversible.
                                     </p>
                                 </div>
                             </div>
@@ -84,19 +84,17 @@
                             </div>
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                    Deactivate account
+                                    Rename
                                 </h3>
                                 <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                        Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.
-                                    </p>
+                                        <input class="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded" v-model="folder" placeholder="Folder Name">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                        @click="renameRequest()"
+                        @click="acceptRenameRequest()"
                         >
                         Rename
                         </button>
@@ -122,9 +120,10 @@
         },
         data: function() {
             return {
-                enable: false,
+                enable      : false,
                 delete_modal: false,
                 rename_modal: false,
+                folder      : ''
             };
         },
         methods: {
@@ -143,11 +142,28 @@
                 }
             },
             renameModal() {
+                this.folder = this.item.name;
                 if (this.rename_modal) {
                     this.rename_modal = false;
                 } else {
                     this.rename_modal = true;
                 }
+            },
+            acceptRenameRequest() {
+                axios.post('/folder/files/'+this.item.id, {
+                    new_name:this.folder
+                })
+                .then(function (response) {
+                })
+                .catch(function (error) {
+                });
+
+                var item = {
+                    id:this.item.parent_id
+                };
+                this.$emit('load_selected_folder', item);
+                this.renameModal();
+                this.enableHelper();
             },
             acceptRequest() {
                 axios.delete('folder/delete/'+this.item.id, {
@@ -161,12 +177,13 @@
                     id:this.item.parent_id
                 };
                 this.$emit('load_selected_folder', item);
+                this.deleteModal();
+                this.enableHelper();
             }
         },
         created() {},
         computed: {},
         mounted() {
-
         }
     };
 </script>

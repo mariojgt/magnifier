@@ -1,32 +1,34 @@
 <?php
 
-namespace AdminUI\AdminUIAdmin\Controllers\Media;
+namespace Mariojgt\Magnifier\Controllers;
 
 //Laravel standard classes
 use Seo;
 use File;
-use Illuminate\Http\Request;
-// MODELS
-use App\Http\Controllers\Controller;
-use AdminUI\AdminUIAdmin\Models\Media;
-use AdminUI\AdminUIAdmin\Models\MediaFolder;
-use AdminUI\AdminUIAdmin\Helpers\ImageHelper;
-use Facades\AdminUI\AdminUIAdmin\Facades\BootFacade;
-use AdminUI\AdminUIAdmin\Resources\MediaFolderResource;
-use AdminUI\AdminUIAdmin\Controllers\Media\MediaFolderApiController;
-use Illuminate\Support\Str;
-use AdminUI\AdminUIAdmin\Resources\MediaResource;
-use Response;
 use Image;
+// MODELS
+use Response;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Mariojgt\Magnifier\Models\Media;
+use Mariojgt\Magnifier\Models\MediaFolder;
+use Mariojgt\Magnifier\Resources\MediaResource;
+use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
-class MediaApiController extends Controller
+class MediaController extends Controller
 {
-
     public function __construct()
     {
-        $this->folderManager = new MediaFolderApiController();
-    }
+        // Get the media sizes
+        $sizes = [];
+        foreach (config('media.sizes') as $key => $value) {
+            $sizes[] = $key;
+        }
+        $this->sizes         = $sizes;
 
+        $this->folderManager = new MediaFolderController();
+    }
 
     public function upload(Request $request, MediaFolder $folder)
     {
@@ -39,7 +41,7 @@ class MediaApiController extends Controller
 
         // Create the database file
         $media                  = new Media();
-        $media->user_id         = admin()->id;
+        //$media->user_id         = admin()->id;
         $media->name            = $finalFileName;
         $media->extension       = Request('file')->getClientOriginalExtension();
         $media->media_folder_id = $folder->id;
@@ -64,7 +66,7 @@ class MediaApiController extends Controller
                 }
             );
             // Save the original file
-            //$img->save($pathToSave . '/' . $finalFile);
+            $img->save($pathToSave . '/' . $finalFile);
             // Save the webp version
             $img->encode('webp', 75)->save($pathToSave . '/' . $finalFileWebp);
         } else {
@@ -115,19 +117,16 @@ class MediaApiController extends Controller
 
         // Make the objecta image intervention object
         $img  = Image::make($originalFile)->orientate();
+
         // resize image, with no upsizing, at the same aspect ratio
-        $avaliablesizes = [
-            'default',
-            'medium',
-            'small',
-            'tiny',
-            'thumbnail',
-        ];
+        $avaliablesizes = $this->sizes;
+
         if (in_array($size, $avaliablesizes)) {
             $targetSize = config('media.sizes')[$size];
         } else {
             $targetSize = config('media.sizes')['small'];
         }
+
         // Resize the image
         $img->resize(
             intval($targetSize['width']),
@@ -139,5 +138,55 @@ class MediaApiController extends Controller
         );
         // Save the webp version
         $img->encode('webp', 75)->save($pathToSave . '/' . $fileName);
+    }
+
+    public function mediaDelete(Media $media)
+    {
+        // Get the path
+        $path = $this->folderManager->media_path.$media->folder->path.'/';
+        // Check if is a image
+        if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            // Get media avaliable sizes
+            $avaliablesizes = $this->sizes;
+
+            foreach ($avaliablesizes as $key => $size) {
+                if ($size == 'default') {
+                    // Get the orinal file
+                    $lookingFile = $media->name . '.'.$media->extension;
+                    File::delete($path.$lookingFile);
+                    // Geth the webp file version
+                    $lookingFile = $media->name . '.webp';
+                    File::delete($path.$lookingFile);
+                } else {
+                    $fileName     = $media->name . '-' . $size . '.webp';
+                    File::delete($path.$fileName);
+                }
+            }
+        } else {
+            $lookingFile = $media->name . '.' . $media->extension;
+            File::delete($path.$lookingFile);
+        }
+
+        $media->delete();
+
+        return true;
+    }
+
+    public function mediaUpdate(Request $request, Media $media)
+    {
+        // $request->validate([
+        //     'title'       => 'required|max:255',
+        //     'alt'         => 'required|max:255',
+        //     'caption'     => 'required|max:255',
+        //     'description' => 'required|max:255',
+        // ]);
+
+        $media->title       = Request('title');
+        $media->alt         = Request('alt');
+        $media->caption     = Request('caption');
+        $media->description = Request('description');
+        $media->save();
+
+        return $media;
     }
 }

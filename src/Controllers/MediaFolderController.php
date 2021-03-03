@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Mariojgt\Magnifier\Models\Media;
 use Mariojgt\Magnifier\Models\MediaFolder;
+use Mariojgt\Magnifier\Resources\MediaResource;
 use Mariojgt\Magnifier\Resources\MediaFolderResource;
 
 class MediaFolderController extends Controller
@@ -82,7 +83,11 @@ class MediaFolderController extends Controller
 
     public function renameFolder(Request $request, MediaFolder $folder)
     {
-        $newName = Str::slug('user', '-');
+        $request->validate([
+            'new_name'      => 'required|max:255|unique:media_folders,name',
+        ]);
+
+        $newName = Str::slug(Request('new_name'), '-');
 
         // Get the old path
         $oldPath = $folder->path;
@@ -109,7 +114,7 @@ class MediaFolderController extends Controller
         rename($oldPath, $newPath);
 
         return response()->json([
-            'data' => true,
+            'data' => $newName,
         ]);
     }
 
@@ -143,5 +148,39 @@ class MediaFolderController extends Controller
             'parent'      => $folder->parent(),
             'folder_info' => $folder
         ]);
+    }
+
+    public function folderFiles(Request $request, MediaFolder $folder)
+    {
+        $dataReturn = null;
+        $order_by   = 'id';
+        $order      = 'DESC';
+        $paginate   = request('per_page') ?? 10;
+
+        // Check if the orderby column was passed
+        if (!empty(Request('orderby'))) {
+            $order_by = Request('orderby');
+        }
+
+        // Check if the order parameter was passed
+        if (!empty(Request('order'))) {
+            $order = Request('order');
+        }
+
+        // Check if items per page parameter was passed
+        if (!empty(Request('perPage'))) {
+            $paginate = Request('perPage');
+        }
+
+        $folder = $folder->media();
+
+        // Check if we are sending any search
+        if (!empty(Request('s'))) {
+            $folder = $folder->where('name', 'like', '%' . Request('s') . '%');
+        }
+
+        $folder = $folder->orderBy($order_by, $order)->paginate($paginate);
+
+        return MediaResource::collection($folder);
     }
 }

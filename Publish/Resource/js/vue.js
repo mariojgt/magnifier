@@ -26,7 +26,7 @@ app.mixin({
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>` + message,
-                duration: 30000,
+                duration: 2000,
                 close: true,
                 gravity: "top",
                 position: "center", // `left`, `center` or `right`

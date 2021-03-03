@@ -95,7 +95,6 @@
               var item = {
                   id:this.parent_id
               };
-
                 this.$emit('load_folder', item);
             }
         },

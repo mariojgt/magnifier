@@ -17,19 +17,16 @@ class Media extends Model
         return $this->hasOne(MediaFolder::class, 'id', 'media_folder_id');
     }
 
-    public function getSizeAttribute()
+    public function size()
     {
-        $filename = $this->id.'.'.$this->extension;
-        $path     = config('media.default_folder').'large/'.$filename;
-        $exists   = Storage::disk(config('media.disk'))->exists($path);
-        $bytes    = $exists ? Storage::disk(config('media.disk'))->size($path) : 0;
-        $kb       = ceil($bytes / 1024);
-        return $kb.'kb';
-    }
+        $bytes = $this->media_size;
 
-    public function path()
-    {
-        $imageHelper = new ImageHelper();
-        return $imageHelper->imageLink($this);
+        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 }
