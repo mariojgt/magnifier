@@ -86,8 +86,13 @@
                     console.log('response');
                     // this.$emit('load_folder', 1);
                 })
-                .catch(function (error) {
-                })
+                .catch(error => {
+                  if (error.response) {
+                        for (const [key, value] of Object.entries(error.response.data.errors)) {
+                            this.unityToast(value, '#9b2020');
+                        }
+                    }
+              });
             }
         },
         created() {},
