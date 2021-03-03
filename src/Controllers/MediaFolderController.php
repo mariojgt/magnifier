@@ -20,7 +20,6 @@ class MediaFolderController extends Controller
 
     public function createFolder(Request $request)
     {
-
         $request->validate([
             'name'      => 'required|max:255',
         ]);
@@ -140,7 +139,9 @@ class MediaFolderController extends Controller
         $children = $folder->children();
 
         return response()->json([
-            'data' => MediaFolderResource::collection($children),
+            'children'    => MediaFolderResource::collection($children),
+            'parent'      => $folder->parent(),
+            'folder_info' => $folder
         ]);
     }
 }

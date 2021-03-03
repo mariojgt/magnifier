@@ -15,6 +15,7 @@ class MediaFolderResource extends JsonResource
             'parent_id' => $this->parent_id,
             'count'     => $this->children()->count(),
             'children'  => $this->children(),
+            'parent'    => $this->parent(),
         ];
     }
 }

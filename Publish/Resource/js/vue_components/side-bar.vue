@@ -50,7 +50,10 @@
                     > </add-folder>
                 </div>
                 <div class="w-1/5 h-10 text-right p-3">
-                    <edit-assistant> </edit-assistant>
+                    <edit-assistant
+                    @load_selected_folder="reloadFolder"
+                    v-bind:item="item"
+                    > </edit-assistant>
                 </div>
             </div>
         </div>
@@ -69,10 +72,10 @@
       },
       methods: {
           reloadFolder (value) {
-                this.$emit('load_folder', this.item);
+            this.$emit('load_folder', value);
           },
           loadRequest () {
-            this.$emit('load_selected_folder', this.item);
+                this.$emit('load_selected_folder', this.item);
           }
       },
       created() {},

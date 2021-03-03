@@ -15,6 +15,8 @@ Route::group([
 
     // Media folder api
     Route::post('/folder/create', [MediaFolderController::class, 'createFolder'])->name('folder.create');
+    Route::delete('/folder/delete/{folder}', [MediaFolderController::class, 'deleteFolder'])
+        ->name('folder.delete');
     Route::get('/folder/list', [MediaFolderController::class, 'folderList'])->name('folder.list');
     Route::get('/folder/load/{folder}', [MediaFolderController::class, 'folderChildren'])
         ->name('folder.load');

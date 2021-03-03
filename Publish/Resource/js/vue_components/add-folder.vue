@@ -58,7 +58,7 @@
         name: "edit-assistant",
         props: {
             parent_id: {
-                type: String,
+                type: Number,
                 default: null
             }
         },
@@ -92,7 +92,11 @@
                         }
                     }
               });
-                this.$emit('load_folder', 'parent');
+              var item = {
+                  id:this.parent_id
+              };
+
+                this.$emit('load_folder', item);
             }
         },
         created() {},

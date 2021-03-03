@@ -13,7 +13,8 @@
 
                 <breadcrumb
                     @load_root="loadParents"
-                    @load_selected_folder="loadFolder"
+                    @load_selected_folder="loadSelectedFolder"
+                    v-bind:breadcrumb="breadcrumb"
                 >
                 </breadcrumb>
 
@@ -88,11 +89,12 @@
         data: function() {
             return {
                 folders: [],
+                breadcrumb: [],
             };
         },
         methods: {
             reloadFolder(value) {
-                if (value === 'parent') {
+                if (value.id === null) {
                     this.loadParents();
                 } else {
                     this.loadFolder(value.id);
@@ -105,7 +107,8 @@
                 axios.get('folder/list', {
                 })
                 .then(response => {
-                    this.folders = response.data.data;
+                    this.folders    = response.data.data;
+                    this.breadcrumb = [];
                 })
                 .catch(function (error) {
                 })
@@ -114,7 +117,8 @@
                 axios.get('/folder/load/'+id, {
                 })
                 .then(response => {
-                    this.folders = response.data.data;
+                    this.folders    = response.data.children;
+                    this.breadcrumb = response.data.parent;
                 })
                 .catch(function (error) {
                 })

@@ -115,9 +115,9 @@
     export default {
         name: "edit-assistant",
         props: {
-            editroute: {
-                type: String,
-                default: ""
+            item: {
+                type: Object,
+                default: {}
             }
         },
         data: function() {
@@ -150,7 +150,17 @@
                 }
             },
             acceptRequest() {
-                console.log('do something');
+                axios.delete('folder/delete/'+this.item.id, {
+                })
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                });
+                var item = {
+                    id:this.item.parent_id
+                };
+                this.$emit('load_selected_folder', item);
             }
         },
         created() {},
