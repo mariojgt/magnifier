@@ -1,5 +1,3 @@
-![image info](https://raw.githubusercontent.com/mariojgt/magnifier/master/Publish/Public/image/magnifier.png)
-
 # Magnifier
 This Laravel packages contain a very simple structure for any kind of packages development for Laravel.
 
