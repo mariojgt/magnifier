@@ -7,7 +7,7 @@
                 </span>
             </a>
         </div>
-        <div class="options absolute bg-white text-gray-600 origin-top-right right-0 mt-2 w-56 rounded-md shadow-lg overflow-hidden" v-if="enable">
+        <div class="options absolute bg-white text-gray-600 origin-top-right right-0 mt-2 w-56 rounded-md shadow-lg overflow-hidden z-0 md:z-50" v-if="enable">
             <a href="javascript:;" class="flex py-3 px-2 text-sm font-bold hover:bg-gray-100"
             @click="renameModal()"
             >
