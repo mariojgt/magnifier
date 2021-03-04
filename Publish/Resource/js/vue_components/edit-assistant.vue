@@ -165,11 +165,11 @@
                 this.renameModal();
                 this.enableHelper();
             },
-            acceptRequest() {
-                axios.delete('folder/delete/'+this.item.id, {
+           async acceptRequest() {
+               await axios.delete('folder/delete/'+this.item.id, {
                 })
                 .then(response => {
-                    console.log(response);
+                    //console.log(response);
                 })
                 .catch(function (error) {
                 });

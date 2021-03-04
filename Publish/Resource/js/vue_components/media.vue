@@ -33,6 +33,9 @@
                     >
                     </breadcrumb>
                 </template>
+                <template #created >
+                    {{ folder_created_at }}
+                </template>
             </media-content>
             <!-- end left section -->
         </div>
@@ -49,9 +52,10 @@
         },
         data: function() {
             return {
-                folders      : [],
-                breadcrumb   : [],
-                folder_target: null,
+                folders          : [],
+                breadcrumb       : [],
+                folder_target    : null,
+                folder_created_at: '',
             };
         },
         methods: {
@@ -81,8 +85,9 @@
                 axios.get('/folder/load/'+id, {
                 })
                 .then(response => {
-                    this.folders    = response.data.children;
-                    this.breadcrumb = response.data.parent;
+                    this.folders           = response.data.children;
+                    this.breadcrumb        = response.data.parent;
+                    this.folder_created_at = response.data.folder_info.created_at;
                 })
                 .catch(function (error) {
                 });

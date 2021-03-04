@@ -1,4 +1,3 @@
-<x-magnifier::layout.login>
-
+<x-magnifier::layout.main>
     <media> </media>
-</x-magnifier::layout.login>
+</x-magnifier::layout.main>

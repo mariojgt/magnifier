@@ -30,6 +30,8 @@ Route::group([
     Route::post('/file/upload/{folder}', [MediaController::class, 'upload'])->name('file.upload');
     Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
         ->name('media.render');
+    Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
+
 
 });
 

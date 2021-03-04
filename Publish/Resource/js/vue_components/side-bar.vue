@@ -51,8 +51,8 @@
                 </div>
                 <div class="w-1/5 h-10 text-right p-3">
                     <edit-assistant
-                    @load_selected_folder="reloadFolder"
-                    v-bind:item="item"
+                        @load_selected_folder="reloadFolder"
+                        v-bind:item="item"
                     > </edit-assistant>
                 </div>
             </div>

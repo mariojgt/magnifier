@@ -22,7 +22,7 @@ class MediaFolderController extends Controller
     public function createFolder(Request $request)
     {
         $request->validate([
-            'name'      => 'required|max:255',
+            'name'      => 'required|unique:media_folders,name|max:255',
         ]);
         $folderName = Str::slug(Request('name'), '-');
         // Create in the database
@@ -146,7 +146,7 @@ class MediaFolderController extends Controller
         return response()->json([
             'children'    => MediaFolderResource::collection($children),
             'parent'      => $folder->parent(),
-            'folder_info' => $folder
+            'folder_info' => new MediaFolderResource($folder)
         ]);
     }
 

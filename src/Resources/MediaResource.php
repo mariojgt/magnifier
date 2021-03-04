@@ -32,6 +32,8 @@ class MediaResource extends JsonResource
             'ext'         => $this->extension,
             'media_size'  => $this->size(),
             'media_key'   => encrypt($this->id),
+            'created_at'  => $this->created_at->diffForHumans(),
+            'updated_at'  => $this->updated_at->diffForHumans(),
         ];
     }
 }

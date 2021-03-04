@@ -9,13 +9,15 @@
             <div class="text-gray-800">
                 <div class="font-bold text-xl">Media</div>
                 <slot name="breadcrumb" >
-
                 </slot>
             </div>
             <div class="flex items-center">
                 <div class="text-sm text-center mr-4">
-                    <div class="font-light text-gray-500">last action</div>
-                    <span class="font-semibold">3 mins ago</span>
+                    <div class="font-light text-gray-500">Created At</div>
+                    <span class="font-semibold">
+                        <slot name="created" >
+                        </slot>
+                    </span>
                 </div>
                 <div>
                     <span
@@ -45,26 +47,80 @@
             </span>
         </div> -->
         <!-- end categories -->
-        <!-- products -->
+        <!-- Media list -->
         <div class="grid grid-cols-3 gap-4 px-5 mt-5 overflow-y-auto h-3/4">
-                <div
-                    v-for="(item, index) in file" :key="index"
-                    class="px-3 py-3 flex flex-col border border-gray-200 rounded-md h-32 justify-between">
-                    <div>
-                        <div class="font-bold text-gray-800">{{ item.name }}</div>
-                        <span class="font-light text-sm text-gray-400">{{ item.ext }}</span>
+            <div
+                v-for="(item, index) in file" :key="index"
+                class="px-3 py-3 flex flex-col border border-gray-200 rounded-md h-32 justify-between">
+                <div>
+                    <div class="font-bold text-gray-800">
+                        {{ item.name }}
                     </div>
-                    <div class="flex flex-row justify-between items-center">
-                        <span class="self-end font-bold text-lg text-yellow-500">
-                            {{ item.media_size }}
-                        </span>
-                        <div v-if="extension.includes(item.ext)" >
-                            <img :src="item.url[4]" class=" h-14 w-14 object-cover rounded-md" alt="">
+                    <span class="font-light text-sm text-gray-400">{{ item.ext }}</span>
+                </div>
+                <div class="flex flex-row justify-between items-center">
+                    <span class="self-end font-bold text-lg text-yellow-500">
+                        {{ item.media_size }}
+                    </span>
+                    <edit-assistant-media
+                        @load_folder="loadFiles"
+                        v-bind:item="item" >
+                    </edit-assistant-media>
+                    <div v-if="extension.includes(item.ext)" >
+                        <img :src="item.url[4]" class=" h-14 w-14 object-cover rounded-md" @click="expandImageLoad(item)" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end media list -->
+
+        <!-- Expand image panel -->
+        <div class="fixed z-10 inset-0 overflow-y-auto" v-if="expand_image">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+                    <div class="flex flex-col justify-center items-center max-w-sm mx-auto my-8">
+                        <div
+                            v-bind:style="{ 'background-image': 'url(' + this.selected_file.url[0] + ')' }"
+                            class="bg-gray-300 h-96 w-full rounded-lg shadow-md bg-cover bg-center"></div>
+                        <div class="w-56 md:w-64 bg-white -mt-10 shadow-lg rounded-lg overflow-hidden">
+                            <div class="py-2 text-center font-bold uppercase tracking-wide text-gray-800">
+                                <a :href="this.selected_file.url[0]" target="_blank" >
+                                    {{ this.selected_file.name }}
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-gray-400">
+                                <h1 class="text-gray-800 font-bold ">
+                                    {{ this.selected_file.created_at }}
+                                </h1>
+                                <button class=" bg-gray-800 text-xs text-white px-2 py-1 font-semibold rounded uppercase hover:bg-gray-700" @click="expandImage" >Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
-        <!-- end products -->    </div>
+
+        <!-- Loading  -->
+        <div class="fixed z-10 inset-0 overflow-y-auto" v-if="is_loading" >
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div class="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+                        <span class="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0" style="
+                            top: 50%;
+                            ">
+                        <i class="fas fa-circle-notch fa-spin fa-5x"></i>
+                        </span>
+                    </div>
+                </div>
+        </div>
+    </div>
 </template>
 <script>
     export default {
@@ -81,10 +137,18 @@
       },
       data: function() {
         return {
-          file: []
+          file         : [],
+          selected_file: [],
+          is_loading   : false,
+          expand_image : false,
         };
       },
       methods: {
+          expandImageLoad (file) {
+              this.expandImage();
+              this.selected_file = file;
+              console.log(file);
+          },
           showModal () {
               this.unityToast('Drag and drop your file');
           },
@@ -92,6 +156,7 @@
                 let droppedFiles = e.dataTransfer.files;
                 if(!droppedFiles) return;
                 // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
+                this.loading();
                 for (const [key, value] of Object.entries(droppedFiles)) {
                     let formData = new FormData();
                     formData.append('file', value);
@@ -106,16 +171,33 @@
                     }
                 }
                 this.loadFiles();
+                this.loading();
             },
-            loadFiles() {
+            async loadFiles() {
                 if (this.parent_id || this.parent_id === 0) {
-                    axios.get('/folder/files/' + this.parent_id, {
-                    })
-                    .then(response => {
-                        this.file = response.data.data;
-                    })
-                    .catch(function (error) {
-                    });
+                    this.loading();
+                        await axios.get('/folder/files/' + this.parent_id, {
+                        })
+                        .then(response => {
+                            this.file = response.data.data;
+                        })
+                        .catch(function (error) {
+                        });
+                    this.loading();
+                }
+            },
+            loading() {
+                if (this.is_loading) {
+                    this.is_loading = false
+                } else {
+                    this.is_loading = true;
+                }
+            },
+            expandImage() {
+                if (this.expand_image) {
+                    this.expand_image = false
+                } else {
+                    this.expand_image = true;
                 }
             }
       },
