@@ -150,7 +150,7 @@
                 }
             },
             acceptRenameRequest() {
-                axios.post('/folder/files/'+this.item.id, {
+                axios.post('/folder/rename/'+this.item.id, {
                     new_name:this.folder
                 })
                 .then(function (response) {

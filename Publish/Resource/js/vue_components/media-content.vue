@@ -8,6 +8,9 @@
         <div class="flex flex-row justify-between items-center px-5 mt-5">
             <div class="text-gray-800">
                 <div class="font-bold text-xl">Media</div>
+                <slot name="breadcrumb" >
+
+                </slot>
             </div>
             <div class="flex items-center">
                 <div class="text-sm text-center mr-4">
@@ -85,7 +88,7 @@
           showModal () {
               this.unityToast('Drag and drop your file');
           },
-          addFile(e) {
+          async addFile(e) {
                 let droppedFiles = e.dataTransfer.files;
                 if(!droppedFiles) return;
                 // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
@@ -95,23 +98,25 @@
                     if (this.parent_id == null) {
                         this.unityToast('Select a folder');
                     } else {
-                        axios.post('/file/upload/'+this.parent_id, formData, {
+                        const results = await axios.post('/file/upload/'+this.parent_id, formData,{
                             headers: {
                             'Content-Type': 'multipart/form-data'
                             }
                         });
-                        this.loadFiles();
                     }
                 }
+                this.loadFiles();
             },
             loadFiles() {
-                axios.get('/folder/files/' + this.parent_id, {
-                })
-                .then(response => {
-                    this.file = response.data.data;
-                })
-                .catch(function (error) {
-                });
+                if (this.parent_id || this.parent_id === 0) {
+                    axios.get('/folder/files/' + this.parent_id, {
+                    })
+                    .then(response => {
+                        this.file = response.data.data;
+                    })
+                    .catch(function (error) {
+                    });
+                }
             }
       },
       watch: {

@@ -14,13 +14,6 @@
                     </div>
                 </div>
 
-                <breadcrumb
-                    @load_root="loadParents"
-                    @load_selected_folder="loadSelectedFolder"
-                    v-bind:breadcrumb="breadcrumb"
-                >
-                </breadcrumb>
-
                 <!-- end header -->
                 <sidebar
                     v-for="(item, index) in folders" :key="index"
@@ -32,6 +25,14 @@
             <!-- end right section -->
             <!-- left section -->
             <media-content v-bind:parent_id="folder_target" >
+                <template #breadcrumb >
+                    <breadcrumb
+                        @load_root="loadParents"
+                        @load_selected_folder="loadSelectedFolder"
+                        v-bind:breadcrumb="breadcrumb"
+                    >
+                    </breadcrumb>
+                </template>
             </media-content>
             <!-- end left section -->
         </div>
