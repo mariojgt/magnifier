@@ -1,6 +1,6 @@
 <template>
     <div>
-        <nav class="text-black font-bold my-8" aria-label="Breadcrumb">
+        <nav class="text-black dark:text-white font-bold my-8" aria-label="Breadcrumb">
             <ol class="list-none p-0 inline-flex">
                 <li class="flex items-center cursor-pointer" @click="loadParents()" >
                     <icon class="w-5 h-5" :name="'home'" > </icon>

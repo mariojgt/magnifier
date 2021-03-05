@@ -1,10 +1,10 @@
 <template>
-    <div class="mx-auto px-5 bg-white">
+    <div class="mx-auto px-5 bg-white dark:bg-black">
         <div class="flex lg:flex-row flex-col-reverse shadow-lg">
             <!-- right section -->
             <div class="w-full lg:w-auto">
                 <!-- header -->
-                <div class="flex flex-row items-center justify-between px-5 mt-5">
+                <div class="flex dark:text-white flex-row items-center justify-between px-5 mt-5">
                     <div class="font-bold text-xl">
                         Media Folders
                         <add-folder

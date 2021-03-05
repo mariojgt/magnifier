@@ -1,24 +1,12 @@
 <template>
     <div class="relative py-3 px-1">
-        <div @click="enableHelper()" >
+        <div @click="deleteModal" >
             <a href="javascript:;" >
                 <span class="w-5 h-5" >
-                    <icon :name="'edit'" > </icon>
+                    <icon :name="'trash-2'" > </icon>
                 </span>
             </a>
         </div>
-        <div class="options absolute bg-white text-gray-600 origin-top-right right-0 mt-2 w-56 rounded-md shadow-lg overflow-hidden z-0 md:z-50" v-if="enable">
-            <a href="javascript:;" class="flex py-3 px-2 text-sm font-bold hover:bg-gray-100"
-            >
-                <span class="mr-auto">Edit</span>
-                <i class="w-5 h-5" data-feather="tag"></i>
-            </a>
-            <a href="javascript:;" class="flex py-3 px-2 text-sm font-bold bg-black text-white hover:bg-red-400" @click="deleteModal"  >
-                <span class="mr-auto">Delete</span>
-                <i class="w-5 h-5" data-feather="trash"></i>
-            </a>
-        </div>
-
         <!-- delete modal -->
         <!-- This example requires Tailwind CSS v2.0+ -->
         <div class="fixed z-10 md:z-50 inset-0 overflow-y-auto" v-if="delete_modal" >
@@ -76,18 +64,10 @@
         },
         data: function() {
             return {
-                enable      : false,
                 delete_modal:false
             };
         },
         methods: {
-            enableHelper() {
-                if (this.enable) {
-                    this.enable = false;
-                } else {
-                    this.enable = true;
-                }
-            },
             deleteModal() {
                 if (this.delete_modal) {
                     this.delete_modal = false;
@@ -96,12 +76,10 @@
                 }
             },
             async confirmDelete() {
-
                 const results = await axios.delete('/file/delete/'+this.item.id, {
                 });
                 // Emit the load folder
                 this.$emit('load_folder');
-                this.enableHelper();
                 this.deleteModal();
             }
         },

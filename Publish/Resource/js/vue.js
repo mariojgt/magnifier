@@ -11,6 +11,8 @@ import media from "./vue_components/media.vue";
 import icon from "./vue_components/icon";
 import breadcrumb from "./vue_components/breadcrumb";
 import editassistantmedia from "./vue_components/edit-assistant-media";
+// image edit
+import imageedit from "./vue_components/media_edit/image-edit";
 
 
 const el = document.getElementById('app');
@@ -48,5 +50,6 @@ app.component('media', media);
 app.component('icon', icon);
 app.component('breadcrumb', breadcrumb);
 app.component('edit-assistant-media', editassistantmedia);
+app.component('image-edit', imageedit);
 
 app.mount(el);

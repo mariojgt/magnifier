@@ -31,6 +31,7 @@ Route::group([
     Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
         ->name('media.render');
     Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
+    Route::post('/file/update/{media}', [MediaController::class, 'mediaUpdate'])->name('file.update');
 
 
 });

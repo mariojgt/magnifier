@@ -9,7 +9,7 @@
     @stack('css')
 </head>
 <body>
-    <div id="app">
+    <div id="app" >
         @if (Auth::check())
             <x-magnifier::layout.navbar />
         @endif
