@@ -2,13 +2,18 @@
     "name": "mariojgt/magnifier",
     "description": "A Laravel Package Magnifier, a quick start for new laravel Packages",
     "keywords": [
-        "laravel"
+        "laravel",
+        "Media library",
+        "Tailwind",
+        "vue js",
+        "library",
+        "Media"
     ],
     "type": "laravel",
     "license": "MIT",
     "authors": [
         {
-            "name": "mario",
+            "name": "Mario Jose Goes Tarosso",
             "email": "mariojgt2@gmail.com"
         }
     ],
@@ -26,7 +31,6 @@
             "@php artisan route:list"
         ]
     },
-
     "extra": {
         "laravel": {
             "providers": [
