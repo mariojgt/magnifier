@@ -5,13 +5,13 @@ A laravel media manager easy to use an integrate.
 
 # Features
 
-- [ ] Clean and basic start point in Laravel package development.
-- [ ] Webpack setup with tailwind css ,sweetalert2 and vue3 basic setup.
-- [ ] Simple out of the box Laravel Authentication.
-- [ ] Example Laravel components, and layout structure.
-- [ ] Tailwind with npm presetup for runing with packages.
-- [ ] Republish command
-- [ ] Reusable laravel layout
-- [ ] Dynamic form
-- [ ] Lightweight
+- [ ] Clean media library
+- [ ] Clean integration with laravel
+- [ ] vue js 3
+- [ ] no dependencies
+- [ ] tailwind
+- [ ] dynamic guard protection
+- [ ] dynamic allowed extension
 - [ ] Dark|light mode out of the box
+- [ ] Auto image resize on request
+- [ ] Universal route for file request

@@ -28,8 +28,15 @@ Route::group([
 
     // Media upload api
     Route::post('/file/upload/{folder}', [MediaController::class, 'upload'])->name('file.upload');
-    Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
-        ->name('media.render');
     Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
     Route::post('/file/update/{media}', [MediaController::class, 'mediaUpdate'])->name('file.update');
+});
+
+// Standard file or image render
+Route::group([
+    'middleware' => 'web'
+], function () {
+    // magnifier
+    Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
+        ->name('media.render');
 });
