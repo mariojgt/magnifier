@@ -9,10 +9,7 @@
     @stack('css')
 </head>
 <body>
-    <div id="app" >
-        @if (Auth::check())
-            <x-magnifier::layout.navbar />
-        @endif
+    <div id="app">
         <div class="content">
             <x-magnifier::layout.flash />
             {{ $slot }}

@@ -9,9 +9,9 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 // Standard
 Route::group([
-    'middleware' => ['web']
+    'middleware' => config('media.magnifier_middleware')
 ], function () {
-    // example page not required to be login
+    // magnifier
     Route::get('/magnifier', [HomeContoller::class, 'index'])->name('magnifier');
 
     // Media folder api
@@ -26,22 +26,10 @@ Route::group([
     Route::post('/folder/rename/{folder}', [MediaFolderController::class, 'renameFolder'])
         ->name('folder.rename');
 
-    // Media upload
+    // Media upload api
     Route::post('/file/upload/{folder}', [MediaController::class, 'upload'])->name('file.upload');
     Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
         ->name('media.render');
     Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
     Route::post('/file/update/{media}', [MediaController::class, 'mediaUpdate'])->name('file.update');
-
-
-});
-
-// Auth Route
-Route::group([
-    'middleware' => ['web', 'auth', 'verified']
-], function () {
-    // Logout function
-    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    // Example page required to be login
-    Route::get('/home_dashboard', [DashboardController::class, 'index'])->name('home_dashboard');
 });

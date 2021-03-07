@@ -2,7 +2,8 @@
 import './extra';
 
 // Fontawesome
-import '@fortawesome/fontawesome-free/js/all.js';
+//import '@fortawesome/fontawesome-free/js/all.js';
+// case you need fontawesome add this in the webpack "@fortawesome/fontawesome-free": "^5.15.2",
 
 // Components
 import './components/inputs';

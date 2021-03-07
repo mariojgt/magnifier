@@ -132,9 +132,16 @@
                     if (this.parent_id == null) {
                         this.unityToast('Select a folder');
                     } else {
-                        const results = await axios.post('/file/upload/' + this.parent_id, formData, {
+                        await axios.post('/file/upload/' + this.parent_id, formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
+                            }
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                for (const [key, value] of Object.entries(error.response.data.errors)) {
+                                this.unityToast(value);
+                                }
                             }
                         });
                     }

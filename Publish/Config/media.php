@@ -22,5 +22,7 @@ return [
             'height' => 300,
             //'crop'   => true
         ]
-    ]
+    ],
+    'magnifier_middleware' => ['web'],  // Add you gard here web by default
+    'allowed_extensions'   => 'csv,txt,xlx,xls,pdf,jpeg,png,gif,webp',
 ];

@@ -23,7 +23,6 @@
         "vue-loader": "^16.0.0-rc.1"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^5.15.2",
         "feather-icons": "^4.28.0",
         "sweetalert2": "^9.17.2",
         "tailwindcss": "^2.0.1",

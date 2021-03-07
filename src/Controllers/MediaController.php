@@ -30,10 +30,11 @@ class MediaController extends Controller
         $this->folderManager = new MediaFolderController();
     }
 
+    // Upload media logic
     public function upload(Request $request, MediaFolder $folder)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt,xlx,xls,pdf,jpeg,png,gif,webp|max:2048'
+            'file' => 'required|mimes:'.config('media.allowed_extensions').'|max:2048'
         ]);
 
         $file          = pathinfo(Request('file')->getClientOriginalName(), PATHINFO_FILENAME);
@@ -78,6 +79,7 @@ class MediaController extends Controller
         ]);
     }
 
+    // Render any kind of media
     public function mediaRender(Media $media, $size = 'default')
     {
         // Get the path
@@ -108,6 +110,7 @@ class MediaController extends Controller
         return $response;
     }
 
+    // Auto image resize
     public function resizeImage($media, $size)
     {
         // Final filename
