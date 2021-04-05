@@ -110,6 +110,44 @@ class MediaController extends Controller
         return $response;
     }
 
+    public function mediaRenderPublic($media, $size = 'default')
+    {
+        $media = Media::findOrFail($media);
+        // Get the path
+        $path = $this->folderManager->media_path;
+        // Check if is a image if yes resize to the target file
+        if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            // Get the file
+            if ($size == 'default') {
+                $lookingFile = $media->name . '.webp';
+            } else {
+                $lookingFile = $media->name . '-' . $size . '.webp';
+            }
+            if (!File::exists($path . $media->folder->path . '/' . $lookingFile)) {
+                $this->resizeImage($media, $size);
+            }
+        } else {
+            $lookingFile = $media->name . '.' . $media->extension;
+        }
+
+        // Original file in the storage
+        $storageFile = $path . $media->folder->path . '/' . $lookingFile;
+        // Basce public path
+        $cachePublicPath = 'cache_media/'.$media->folder->path;
+        $basePubliPath = public_path($cachePublicPath);
+        // Final path witl the file ready to be copy
+        $publicFile = $basePubliPath .'/'. $lookingFile;
+
+        // Check if the files exist if yes return the path
+        if (File::exists($publicFile)) {
+            return url($cachePublicPath.'/'.$lookingFile);
+        } else {
+            File::isDirectory($basePubliPath) or File::makeDirectory($basePubliPath, 0777, true, true);
+            File::copy($storageFile, $publicFile);
+            return url($cachePublicPath.'/'.$lookingFile);
+        }
+    }
+
     // Auto image resize
     public function resizeImage($media, $size)
     {

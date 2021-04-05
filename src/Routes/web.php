@@ -39,4 +39,8 @@ Route::group([
     // magnifier
     Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
         ->name('media.render');
+
+    // Render public media
+    Route::get('media/public/{media}/{size}', [MediaController::class, 'mediaRenderPublic'])
+        ->name('media.public');
 });
