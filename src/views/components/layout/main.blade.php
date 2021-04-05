@@ -16,8 +16,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('vendor/Magnifier/js/vue.js') }}"></script>
     <script src="{{ asset('vendor/Magnifier/js/app.js') }}"></script>
+    <script src="{{ asset('vendor/Magnifier/js/vue.js') }}"></script>
     <script>
         const Toast = Swal.mixin({
             toast: true,

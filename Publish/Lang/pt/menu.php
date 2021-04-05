@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'home'                    => 'Casa',
+    'uses'                    => 'Usuário',
+    'admins'                  => 'Administradores',
+    'customers'               => 'clientes',
+    'settings'                => 'Configurações',
+    'navigation'              => 'Navegação',
+    'media'                   => 'Media',
+    'permissions'             => 'Permissões',
+    'configurations'          => 'Configurações',
+    'pos_management'          => 'Gestão POS',
+    'product'                 => 'produtos',
+    'category'                => 'Categoria',
+    'brands'                  => 'Marcas',
+    'suppliers'               => 'Fornecedores',
+    'postage'                 => 'Postagem',
+    'discount_code'           => 'Código de desconto',
+    'orders'                  => 'Pedidos',
+    'time_management'         => 'Gerenciamento de tempo',
+    'staff_time_track'        => 'Controle de tempo da equipe',
+    'staff_time_track_report' => 'Relatório de controle de tempo da equipe',
+    'email_templates'         => 'Email Template',
+    'activity_log'            => 'Logs',
+    'role'                    => 'Roles',
+];

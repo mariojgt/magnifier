@@ -30,7 +30,7 @@
                                     Folder Name
                                 </h3>
                                 <div class="mt-2">
-                                    <input class="shadow appearance-none border rounded py-2 px-3 text-grey-darker" v-model="folder" >
+                                    <input class="shadow appearance-none border rounded py-2 px-3 text-black" v-model="folder" >
                                 </div>
                             </div>
                         </div>
