@@ -3,8 +3,8 @@ namespace Mariojgt\Magnifier;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Mariojgt\Magnifier\Commands\Publish;
 use Mariojgt\Magnifier\Commands\Republish;
+use Mariojgt\Magnifier\Commands\Install;
 use Mariojgt\Magnifier\Events\UserVerifyEvent;
 use Mariojgt\Magnifier\Listeners\SendUserVerifyListener;
 
@@ -27,6 +27,7 @@ class MagnifierProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Republish::class,
+                Install::class,
             ]);
         }
 
