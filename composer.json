@@ -18,7 +18,8 @@
         }
     ],
     "require":{
-        "php": "^7.3|^8.0"
+        "php": "^7.3|^8.0",
+        "intervention/image": "^2.5"
     },
     "autoload": {
         "psr-4": {

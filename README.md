@@ -22,6 +22,8 @@ First you will need to run the migrations.
 
 ```art
 php artisan migrate
+
+php artisan storage:link
 ```
 
 Once the migration is done you can access the route /magnifier, to protect the routes using a login route you will need to change the config file media.php in the config folder, you can also add some custom sizes.
