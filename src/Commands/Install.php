@@ -39,7 +39,6 @@ class Install extends Command
      */
     public function handle()
     {
-
         // Copy the need file to make the onix pacakge to run
         Artisan::call('vendor:publish', [
             '--provider' => 'Mariojgt\Magnifier\MagnifierProvider',
@@ -49,9 +48,10 @@ class Install extends Command
         // Migrate
         Artisan::call('migrate');
 
-        // Create hte sotrage link
+        // Create the storage link
         Artisan::call('storage:link');
 
+        // Return a message in the console
         $this->newLine();
         $this->info('The command was successful!');
     }

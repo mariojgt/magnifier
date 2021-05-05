@@ -9,6 +9,7 @@ class HomeContoller extends Controller
 {
     public function index()
     {
+        // Render the magnifier view
         return view('magnifier::content.index');
     }
 }

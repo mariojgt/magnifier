@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Mariojgt\Magnifier\Controllers\HomeContoller;
 use Mariojgt\Magnifier\Controllers\MediaController;
-use Mariojgt\Magnifier\Controllers\DashboardController;
-use Mariojgt\Magnifier\Controllers\Auth\LoginController;
 use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 // Standard

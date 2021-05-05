@@ -34,7 +34,7 @@ class MediaController extends Controller
     public function upload(Request $request, MediaFolder $folder)
     {
         $request->validate([
-            'file' => 'required|mimes:'.config('media.allowed_extensions').'|max:2048'
+            'file' => 'required|mimes:' . config('media.allowed_extensions') . '|max:2048'
         ]);
 
         $file          = pathinfo(Request('file')->getClientOriginalName(), PATHINFO_FILENAME);
@@ -133,18 +133,18 @@ class MediaController extends Controller
         // Original file in the storage
         $storageFile = $path . $media->folder->path . '/' . $lookingFile;
         // Basce public path
-        $cachePublicPath = 'cache_media/'.$media->folder->path;
+        $cachePublicPath = 'cache_media/' . $media->folder->path;
         $basePubliPath = public_path($cachePublicPath);
         // Final path witl the file ready to be copy
-        $publicFile = $basePubliPath .'/'. $lookingFile;
+        $publicFile = $basePubliPath . '/' . $lookingFile;
 
         // Check if the files exist if yes return the path
         if (File::exists($publicFile)) {
-            return url($cachePublicPath.'/'.$lookingFile);
+            return url($cachePublicPath . '/' . $lookingFile);
         } else {
             File::isDirectory($basePubliPath) or File::makeDirectory($basePubliPath, 0777, true, true);
             File::copy($storageFile, $publicFile);
-            return url($cachePublicPath.'/'.$lookingFile);
+            return url($cachePublicPath . '/' . $lookingFile);
         }
     }
 
@@ -184,7 +184,7 @@ class MediaController extends Controller
     public function mediaDelete(Media $media)
     {
         // Get the path
-        $path = $this->folderManager->media_path.$media->folder->path.'/';
+        $path = $this->folderManager->media_path . $media->folder->path . '/';
         // Check if is a image
         if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
             // Get media avaliable sizes
@@ -193,19 +193,19 @@ class MediaController extends Controller
             foreach ($avaliablesizes as $key => $size) {
                 if ($size == 'default') {
                     // Get the orinal file
-                    $lookingFile = $media->name . '.'.$media->extension;
-                    File::delete($path.$lookingFile);
+                    $lookingFile = $media->name . '.' . $media->extension;
+                    File::delete($path . $lookingFile);
                     // Geth the webp file version
                     $lookingFile = $media->name . '.webp';
-                    File::delete($path.$lookingFile);
+                    File::delete($path . $lookingFile);
                 } else {
                     $fileName     = $media->name . '-' . $size . '.webp';
-                    File::delete($path.$fileName);
+                    File::delete($path . $fileName);
                 }
             }
         } else {
             $lookingFile = $media->name . '.' . $media->extension;
-            File::delete($path.$lookingFile);
+            File::delete($path . $lookingFile);
         }
 
         $media->delete();

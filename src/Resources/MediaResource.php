@@ -4,7 +4,6 @@ namespace Mariojgt\Magnifier\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Mariojgt\Magnifier\Controllers\MediaController;
-use Mariojgt\Magnifier\Models\Media;
 
 class MediaResource extends JsonResource
 {

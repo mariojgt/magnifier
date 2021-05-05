@@ -2,7 +2,6 @@
 
 namespace Mariojgt\Magnifier\Resources;
 
-use AdminUI\AdminUIAdmin\Helpers\ImageHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MediaFolderResource extends JsonResource

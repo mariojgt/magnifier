@@ -2,7 +2,6 @@
 
 namespace Mariojgt\Magnifier\Controllers;
 
-use Seo;
 use File;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -21,28 +20,31 @@ class MediaFolderController extends Controller
 
     public function createFolder(Request $request)
     {
+        // Validate the data
         $request->validate([
             'name'      => 'required|unique:media_folders,name|max:255',
         ]);
+        // Parse the folder name to make sure the name is valid
         $folderName = Str::slug(Request('name'), '-');
         // Create in the database
         $mediaFolder            = new MediaFolder();
         $mediaFolder->name      = $folderName;
         $mediaFolder->parent_id = Request('parent_id') ?? null;
+        // Check if the folder being create has a parent
         if (empty(Request('parent_id'))) {
             $mediaFolder->path          = $folderName;
         } else {
             $parent            = MediaFolder::find(Request('parent_id'));
             $mediaFolder->path = $parent->path . '/' . $folderName;
         }
-
+        // Save the folder
         $mediaFolder->save();
 
         // Create the folder path
         $path = $this->media_path . $mediaFolder->path;
-
+        // CHeck if need to create a fisical directory on the server
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
-
+        // Return the response
         return response()->json([
             'data' => $mediaFolder,
         ]);
@@ -50,19 +52,23 @@ class MediaFolderController extends Controller
 
     public function deleteFolder(MediaFolder $folder)
     {
+        // Check if the folder has children to delete
         if (!empty($folder->children()[0])) {
             $this->deleteChildren($folder->children());
         }
+        // Delete all the media with the folder id
         $delete = Media::where('media_folder_id', $folder->id)->delete();
+        // Delete the folder
         $folder->delete();
         // Remove the files from the storage
         $path = $this->media_path . '' . $folder->path;
 
         // Check if the path exist
         if (File::isDirectory($path)) {
+            // If yes delete the folder itself
             File::deleteDirectory($path);
         }
-
+        // Return a response
         return response()->json([
             'data' => true,
         ]);
@@ -70,6 +76,7 @@ class MediaFolderController extends Controller
 
     public function deleteChildren($children)
     {
+        // Do a recursive function that will loop and delete the files under the folder
         foreach ($children as $key => $value) {
             if (!empty($value->children()[0])) {
                 $this->deleteChildren($value->children());
@@ -83,12 +90,12 @@ class MediaFolderController extends Controller
 
     public function renameFolder(Request $request, MediaFolder $folder)
     {
+        // Validate the data
         $request->validate([
             'new_name'      => 'required|max:255|unique:media_folders,name',
         ]);
-
+        // Make sure is a valid name
         $newName = Str::slug(Request('new_name'), '-');
-
         // Get the old path
         $oldPath = $folder->path;
         // Get the new path

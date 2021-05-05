@@ -2,9 +2,7 @@
 
 namespace Mariojgt\Magnifier\Models;
 
-use Storage;
 use Illuminate\Database\Eloquent\Model;
-use AdminUI\AdminUIAdmin\Helpers\ImageHelper;
 
 class Media extends Model
 {
