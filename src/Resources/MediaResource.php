@@ -37,7 +37,7 @@ class MediaResource extends JsonResource
             'id'              => $this->id,
             'name'            => $this->name,
             'user'            => $this->admin,
-            'url'             => $url,
+            'url'             => $urlPublic,
             'url_cache_media' => $urlPublic,
             'title'           => $this->title,
             'alt'             => $this->alt,
