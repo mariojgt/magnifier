@@ -2,16 +2,13 @@
 
 namespace Mariojgt\Magnifier\Controllers;
 
-//Laravel standard classes
-use Seo;
-use File;
-use Image;
-// MODELS
-use Response;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 use Mariojgt\Magnifier\Models\Media;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Response;
 use Mariojgt\Magnifier\Models\MediaFolder;
 use Mariojgt\Magnifier\Resources\MediaResource;
 use Mariojgt\Magnifier\Controllers\MediaFolderController;
@@ -29,7 +26,7 @@ class MediaController extends Controller
 
         $this->folderManager = new MediaFolderController();
     }
-    
+
     /**
      * @param mixed $file
      * @param MediaFolder $folder
