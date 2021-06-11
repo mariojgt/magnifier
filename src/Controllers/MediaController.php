@@ -19,8 +19,11 @@ class MediaController extends Controller
     {
         // Get the media sizes
         $sizes = [];
-        foreach (config('media.sizes') as $key => $value) {
-            $sizes[] = $key;
+        // If not empty for some reason
+        if (config('media.sizes')) {
+            foreach (config('media.sizes') as $key => $value) {
+                $sizes[] = $key;
+            }
         }
         $this->sizes         = $sizes;
 
