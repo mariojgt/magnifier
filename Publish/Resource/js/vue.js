@@ -14,12 +14,11 @@ import editassistantmedia from "./vue_components/edit-assistant-media";
 // image edit
 import imageedit from "./vue_components/media_edit/image-edit";
 
-
 const el = document.getElementById('app');
 
 const app = createApp({});
 
-// Make the swet alert avaliable to use inside vue js
+// Make the swwet alert avaliable to use inside vue js
 app.mixin({
     methods: {
         unityToast: function(message) {

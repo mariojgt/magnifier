@@ -30,7 +30,7 @@ class MagnifierProvider extends ServiceProvider
         // Load magnifier routes
         $this->loadRoutesFrom(__DIR__ . '/Routes/web.php');
         // Load Migrations
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
     }
 
     /**
