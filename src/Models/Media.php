@@ -19,7 +19,7 @@ class Media extends Model
     {
         $bytes = $this->media_size;
 
-        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
         for ($i = 0; $bytes > 1024; $i++) {
             $bytes /= 1024;

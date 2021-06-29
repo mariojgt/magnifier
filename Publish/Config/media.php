@@ -20,7 +20,6 @@ return [
         'thumbnail' => [
             'width'  => 150,
             'height' => 300,
-            //'crop'   => true
         ]
     ],
     'magnifier_middleware' => ['web'],  // Add you gard here web by default
