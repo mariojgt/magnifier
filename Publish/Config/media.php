@@ -22,6 +22,6 @@ return [
             'height' => 300,
         ]
     ],
-    'magnifier_middleware' => ['web'],  // Add you gard here web by default
+    'magnifier_middleware' => ['web'],  // Add you guard here web by default
     'allowed_extensions'   => 'csv,txt,xlx,xls,pdf,jpeg,png,gif,webp',
 ];
