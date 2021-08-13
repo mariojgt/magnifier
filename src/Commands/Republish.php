@@ -54,10 +54,10 @@ class Republish extends Command
         $bar->advance(); // Little Progress bar
 
         // Now we move the lang file
-        $targetFolderPublic = resource_path('lang/');
-        $destitionPublic    = __DIR__ . '/../../Publish/Lang';
-        File::copyDirectory($targetFolderPublic, $destitionPublic);
-        $bar->advance(); // Little Progress bar
+        // $targetFolderPublic = resource_path('lang/');
+        // $destitionPublic    = __DIR__ . '/../../Publish/Lang';
+        // File::copyDirectory($targetFolderPublic, $destitionPublic);
+        // $bar->advance(); // Little Progress bar
 
         // Now we copy the webpack file
         $targetFolderWebPack = base_path('webpack.mix.js');
