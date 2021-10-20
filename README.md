@@ -23,6 +23,8 @@ A laravel media manager easy to use an integrate.
 First you will need to run the migrations.
 
 ```art
+composer require mariojgt/magnifier
+
 php artisan migrate
 
 php artisan storage:link
