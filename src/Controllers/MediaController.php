@@ -5,6 +5,7 @@ namespace Mariojgt\Magnifier\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Mariojgt\Magnifier\Models\Media;
 use Intervention\Image\Facades\Image;
@@ -43,7 +44,7 @@ class MediaController extends Controller
 
         // Create the database file
         $media                  = new Media();
-        $media->user_id         = admin()->id ?? 1000;
+        $media->user_id         = Auth::user()->id ?? 1000;
         $media->name            = $finalFileName;
         $media->extension       = $file->getExtension();
         $media->media_folder_id = $folder->id;
