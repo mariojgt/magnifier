@@ -24,30 +24,45 @@ class MediaFolderController extends Controller
         $request->validate([
             'name'      => 'required|unique:media_folders,name|max:255',
         ]);
-        // Parse the folder name to make sure the name is valid
-        $folderName = Str::slug(Request('name'), '-');
-        // Create in the database
-        $mediaFolder            = new MediaFolder();
-        $mediaFolder->name      = $folderName;
-        $mediaFolder->parent_id = Request('parent_id') ?? null;
-        // Check if the folder being create has a parent
-        if (empty(Request('parent_id'))) {
-            $mediaFolder->path          = $folderName;
-        } else {
-            $parent            = MediaFolder::find(Request('parent_id'));
-            $mediaFolder->path = $parent->path . '/' . $folderName;
-        }
-        // Save the folder
-        $mediaFolder->save();
 
-        // Create the folder path
-        $path = $this->media_path . $mediaFolder->path;
-        // CHeck if need to create a fisical directory on the server
-        File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
+        $mediaFolder =  $this->makeFolder(Request('name'), Request('parent_id'));
+
         // Return the response
         return response()->json([
             'data' => $mediaFolder,
         ]);
+    }
+
+    public function makeFolder($name, $parent_id = null)
+    {
+        $mediaFolder = MediaFolder::where('name', $name)->first();
+
+        if (!empty($mediaFolder)) {
+            return $mediaFolder;
+        } else {
+            // Parse the folder name to make sure the name is valid
+            $folderName = Str::slug($name, '-');
+            // Create in the database
+            $mediaFolder            = new MediaFolder();
+            $mediaFolder->name      = $folderName;
+            $mediaFolder->parent_id = $parent_id ?? null;
+            // Check if the folder being create has a parent
+            if (empty($parent_id)) {
+                $mediaFolder->path          = $folderName;
+            } else {
+                $parent            = MediaFolder::find($parent_id);
+                $mediaFolder->path = $parent->path . '/' . $folderName;
+            }
+            // Save the folder
+            $mediaFolder->save();
+
+            // Create the folder path
+            $path = $this->media_path . $mediaFolder->path;
+            // CHeck if need to create a fisical directory on the server
+            File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
+            // Return the response
+            return $mediaFolder;
+        }
     }
 
     public function deleteFolder(MediaFolder $folder)
