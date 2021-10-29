@@ -1,17 +1,19 @@
-const plugin = require('tailwindcss/plugin')
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
-    darkMode: 'class',
+    mode: 'jit',
+    darkMode: "class",
     purge: [
         "./vendor/Magnifier/src/views/**/*.php",
+        "./resources/vendor/Magnifier/**/*.vue",
     ],
     theme: {
-      extend: {},
+        extend: {},
     },
     variants: {
         extend: {
-          textOpacity: ['dark']
-        }
+            textOpacity: ["dark"],
+        },
     },
-    plugins: [],
-  }
+    plugins: [require("daisyui")],
+};
