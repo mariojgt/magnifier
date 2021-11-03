@@ -147,15 +147,17 @@ class MediaController extends Controller
             $lookingFile = $media->name . '.' . $media->extension;
         }
 
-        $finalPath = $path . $media->folder->path . '/' . $lookingFile;
+        return asset('/storage/media/' . $media->folder->path . '/' . $lookingFile);
 
-        $file = File::get($finalPath);
-        $type = File::mimeType($finalPath);
+        // $finalPath = $path . $media->folder->path . '/' . $lookingFile;
 
-        $response = Response::make($file, 200);
-        $response->header("Content-Type", $type);
+        // $file = File::get($finalPath);
+        // $type = File::mimeType($finalPath);
 
-        return $response;
+        // $response = Response::make($file, 200);
+        // $response->header("Content-Type", $type);
+
+        // return $response;
     }
 
     public function mediaRenderPublic($media, $size = 'default')
