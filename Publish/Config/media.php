@@ -23,47 +23,6 @@ return [
             //'crop'   => true
         ]
     ],
-
-    'extensions' => [
-        'jpg' => [
-            'resizable' => true,
-            'ctype' => 'image/jpeg',
-        ],
-        'png' => [
-            'resizable' => true,
-            'ctype' => 'image/png',
-        ],
-        'gif' => [
-            'resizable' => true,
-            'ctype' => 'image/gif',
-        ],
-        'jpeg' => [
-            'resizable' => true,
-            'ctype' => 'image/jpeg',
-        ],
-        'bmp' => [
-            'ctype' => 'image/bmp'
-        ],
-        'pdf' => [
-            'ctype' => 'application/pdf'
-        ],
-        'mp4' => [
-            'folder'    => 'expire/',
-            'ctype'     => 'video/mp4'
-        ],
-        'mov' => [
-            'folder'    => 'expire/',
-            'ctype'     => 'video/quicktime'
-        ],
-        'mpg' => [
-            'folder'    => 'expire/',
-            'ctype'     => 'video/mpeg'
-        ],
-        'avi' => [
-            'folder'    => 'expire/',
-            'ctype'     => 'video/x-msvideo'
-        ]
-    ],
     'use_webp'       => true,
     'disk'           => 'public',
     'public_path'    => storage_path(),
