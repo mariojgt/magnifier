@@ -3,6 +3,7 @@
 namespace Mariojgt\Magnifier\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Mariojgt\Magnifier\Controllers\MediaApiRenderController;
 
 class Media extends Model
 {
@@ -27,4 +28,14 @@ class Media extends Model
 
         return round($bytes, 2) . ' ' . $units[$i];
     }
+
+    /**
+	 * Return the paths of the files so we can use in the website
+	 * @return [type]
+	 */
+	public function renderFiles($useFallback = false)
+	{
+		$mediaManager = new MediaApiRenderController();
+		return $mediaManager->renderMediaUrlPath($this, $useFallback);
+	}
 }

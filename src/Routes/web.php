@@ -29,16 +29,3 @@ Route::group([
     Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
     Route::post('/file/update/{media}', [MediaController::class, 'mediaUpdate'])->name('file.update');
 });
-
-// Standard file or image render
-Route::group([
-    'middleware' => 'web'
-], function () {
-    // magnifier
-    Route::get('media/display/{media}/{size}/{file?}', [MediaController::class, 'mediaRender'])
-        ->name('media.render');
-
-    // Render public media
-    Route::get('media/public/{media}/{size}', [MediaController::class, 'mediaRenderPublic'])
-        ->name('media.public');
-});
