@@ -45,45 +45,6 @@ class MediaController extends Controller
 		$fileHandle = $this->handleFileSource($file, $folder);
 		$media      = $this->uploadAction($file, $folder, $fileHandle);
 
-		// Check if the file alread exist if yes do nothing
-		// $media = Media::where('name', $finalFileName)->first();
-		// if (!empty($media)) {
-		//     return $media;
-		// }
-
-		// // Create the database file
-		// $media                  = new Media();
-		// $media->user_id         = admin()->id ?? 1000;
-		// $media->name            = $finalFileName;
-		// $media->extension       = $file->getExtension();
-		// $media->media_folder_id = $folder->id;
-		// $media->media_size      = $file->getSize();
-		// $media->save();
-
-		// $pathToSave = $this->folderManager->media_path . '' . $folder->path;
-		// $finalFile  = $finalFileName . '.' . $file->getExtension();
-		// // If is a image need to be resize
-		// if (in_array($file->getExtension(), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
-		//     $finalFileWebp  = $finalFileName . '.' . 'webp';
-		//     // Make the objecta image intervention object
-		//     $img  = Image::make($file->getRealPath())->orientate();
-		//     // resize image, with no upsizing, at the same aspect ratio
-		//     $img->resize(
-		//         intval(config('media.sizes.default.width')),
-		//         intval(config('media.sizes.default.height')),
-		//         function ($constraint) {
-		//             $constraint->aspectRatio();
-		//             $constraint->upsize();
-		//         }
-		//     );
-		//     // Save the original file
-		//     $img->save($pathToSave . '/' . $finalFile);
-		//     // Save the webp version
-		//     $img->encode('webp', 75)->save($pathToSave . '/' . $finalFileWebp);
-		// } else {
-		//     $request->file('file')->move($pathToSave, $finalFile);
-		// }
-
 		return $media;
 	}
 
