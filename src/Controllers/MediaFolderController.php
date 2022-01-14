@@ -15,7 +15,7 @@ class MediaFolderController extends Controller
 {
     public function __construct()
     {
-        $this->media_path = storage_path('app/public/media/');
+        $this->media_path = config('media.public_path') . '/' . config('media.default_folder');
     }
 
     public function createFolder(Request $request)
