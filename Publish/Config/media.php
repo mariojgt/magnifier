@@ -28,7 +28,7 @@ return [
     'public_path'    => storage_path(),
     'default_folder' => 'app/public/media/',
     'default_size'   => 'small',
-    'img_fall_back'  => '/noimage.jpg', // path is images/imagename.png so the helper knows
+    'img_fall_back'  => '/magnifier.png', // path is images/imagename.png so the helper knows
     'no_image_id'    => '1',
     'max_size'       => '10048',
     'allowed'        => 'csv,txt,xlx,xls,pdf,jpeg,png,gif,webp',
