@@ -25,8 +25,8 @@ class MediaFolder extends Model
         foreach ($path as $key => $value) {
             $tempFolder = MediaFolder::where('name', $value)->first();
             $breadCrumb[] = [
-                'id'   => $tempFolder->id,
-                'name' => $tempFolder->name
+                'id'   => $tempFolder->id ?? '',
+                'name' => $tempFolder->name ?? ''
             ];
         }
         return $breadCrumb;

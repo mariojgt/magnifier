@@ -8,11 +8,22 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 class MediaApiRenderController extends Controller
 {
+	/**
+	 * Start the construct with the media folder controller
+	 */
 	public function __construct()
 	{
 		$this->folderManager = new MediaFolderController();
 	}
 
+	/**
+	 * Render the file or image
+	 *
+	 * @param mixed $media
+	 * @param bool $useFallback
+	 *
+	 * @return [type]
+	 */
 	public function renderMediaUrlPath($media, $useFallback = false)
 	{
 		switch (config('media.disk')) {

@@ -21,6 +21,7 @@ class CreateMediaTable extends Migration
                 $table->string('extension')->default('jpg');
                 $table->unsignedBigInteger('media_folder_id')->index();
                 $table->string('title')->nullable();
+                $table->string('disk')->nullable();
                 $table->string('alt')->nullable();
                 $table->string('media_size')->nullable();
                 $table->string('caption')->nullable();

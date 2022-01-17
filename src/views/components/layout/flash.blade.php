@@ -32,7 +32,7 @@
 @endif
 
 {{-- general message --}}
-@if ($errors->any())
+@if ($errors = Session::get('errors'))
 @php
 $count= 0;
 @endphp

@@ -5,15 +5,7 @@
         @dragover.prevent
         @dragenter="showModal"
         @dragleave="showModal"
-        class="
-            w-full
-            min-h-screen
-            shadow-lg
-            border-dotted border-4
-            bg-gray-800
-            dark:border-white
-            border-black
-        "
+        class="w-full min-h-screen shadow-lg border-dotted border-4 bg-gray-800 dark:border-white border-black"
     >
         <!-- header -->
         <div class="flex flex-row justify-between items-center px-5 mt-5">
@@ -31,14 +23,7 @@
                 <div>
                     <div @click="addFileModal()">
                         <span
-                            class="
-                                px-4
-                                py-2
-                                bg-gray-200
-                                text-gray-800
-                                font-semibold
-                                rounded
-                            "
+                            class="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded"
                         >
                             +
                         </span>
@@ -50,82 +35,34 @@
                         v-if="add_modal_file_enable"
                     >
                         <div
-                            class="
-                                flex
-                                items-end
-                                justify-center
-                                min-h-screen
-                                pt-4
-                                px-4
-                                pb-20
-                                text-center
-                                sm:block sm:p-0
-                            "
+                            class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
                         >
                             <div
                                 class="fixed inset-0 transition-opacity"
                                 aria-hidden="true"
                             >
                                 <div
-                                    class="
-                                        absolute
-                                        inset-0
-                                        bg-gray-500
-                                        opacity-75
-                                    "
+                                    class="absolute inset-0 bg-gray-500 opacity-75"
                                 ></div>
                             </div>
 
                             <span
-                                class="
-                                    hidden
-                                    sm:inline-block sm:align-middle sm:h-screen
-                                "
+                                class="hidden sm:inline-block sm:align-middle sm:h-screen"
                                 aria-hidden="true"
                                 >&#8203;</span
                             >
                             <div
-                                class="
-                                    inline-block
-                                    align-bottom
-                                    bg-white
-                                    rounded-lg
-                                    text-left
-                                    overflow-hidden
-                                    shadow-xl
-                                    transform
-                                    transition-all
-                                    sm:my-8
-                                    sm:align-middle
-                                    sm:max-w-lg
-                                    sm:w-full
-                                "
+                                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
                                 role="dialog"
                                 aria-modal="true"
                                 aria-labelledby="modal-headline"
                             >
                                 <div
-                                    class="
-                                        bg-white
-                                        px-4
-                                        pt-5
-                                        pb-4
-                                        sm:p-6 sm:pb-4
-                                    "
+                                    class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
                                 >
                                     <div class="sm:flex sm:items-start">
                                         <div
-                                            class="
-                                                mx-auto
-                                                flex-shrink-0 flex
-                                                items-center
-                                                justify-center
-                                                h-12
-                                                w-12
-                                                rounded-full
-                                                bg-red-100
-                                                sm:mx-0 sm:h-10 sm:w-10
-                                            "
+                                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
                                         >
                                             <!-- Heroicon name: outline/exclamation -->
                                             <!-- <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -139,19 +76,10 @@
                                             </icon>
                                         </div>
                                         <div
-                                            class="
-                                                mt-3
-                                                text-center
-                                                sm:mt-0 sm:ml-4 sm:text-left
-                                            "
+                                            class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
                                         >
                                             <h3
-                                                class="
-                                                    text-lg
-                                                    leading-6
-                                                    font-medium
-                                                    text-gray-900
-                                                "
+                                                class="text-lg leading-6 font-medium text-gray-900"
                                                 id="modal-headline"
                                             >
                                                 File Upload
@@ -160,15 +88,7 @@
                                                 <input
                                                     type="file"
                                                     multiple
-                                                    class="
-                                                        shadow
-                                                        appearance-none
-                                                        border
-                                                        rounded
-                                                        py-2
-                                                        px-3
-                                                        text-black
-                                                    "
+                                                    class="shadow appearance-none border rounded py-2 px-3 text-black"
                                                     id="file"
                                                     ref="file"
                                                     @change="handleFileUpload()"
@@ -178,36 +98,11 @@
                                     </div>
                                 </div>
                                 <div
-                                    class="
-                                        bg-gray-50
-                                        px-4
-                                        py-3
-                                        sm:px-6 sm:flex sm:flex-row-reverse
-                                    "
+                                    class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse"
                                 >
                                     <button
                                         type="button"
-                                        class="
-                                            mt-3
-                                            w-full
-                                            inline-flex
-                                            justify-center
-                                            rounded-md
-                                            border border-gray-300
-                                            shadow-sm
-                                            px-4
-                                            py-2
-                                            bg-white
-                                            text-base
-                                            font-medium
-                                            text-gray-700
-                                            hover:bg-gray-50
-                                            focus:outline-none
-                                            focus:ring-2
-                                            focus:ring-offset-2
-                                            focus:ring-indigo-500
-                                            sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm
-                                        "
+                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                         @click="addFileModal()"
                                     >
                                         Cancel
@@ -244,24 +139,7 @@
             <div
                 v-for="(item, index) in file"
                 :key="index"
-                class="
-                    px-3
-                    py-3
-                    flex flex-col
-                    border-4 border-black
-                    dark:border-white
-                    dark:text-white
-                    dark:hover:text-black
-                    dark:hover:border-black
-                    dark:hover:bg-white
-                    border-dashed
-                    rounded-md
-                    h-32
-                    justify-between
-                    hover:bg-black hover:text-white hover:border-white
-                    transition
-                    duration-150
-                "
+                class="px-3 py-3 flex flex-col border-4 border-black dark:border-white dark:text-white dark:hover:text-black dark:hover:border-black dark:hover:bg-white border-dashed rounded-md h-32 justify-between hover:bg-black hover:text-white hover:border-white transition duration-150"
             >
                 <div>
                     <div class="font-bold">
@@ -304,33 +182,10 @@
         <!-- v-if="is_loading" -->
         <div
             v-if="is_loading"
-            class="
-                fixed
-                top-0
-                left-0
-                right-0
-                bottom-0
-                w-full
-                h-screen
-                z-50
-                overflow-hidden
-                bg-black
-                opacity-75
-                flex flex-col
-                items-center
-                justify-center
-            "
+            class="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-black opacity-75 flex flex-col items-center justify-center"
         >
             <div
-                class="
-                    loader
-                    ease-linear
-                    rounded-full
-                    border-4 border-t-4 border-gray-200
-                    h-12
-                    w-12
-                    mb-4
-                "
+                class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"
             ></div>
             <h2 class="text-center text-white text-xl font-semibold">
                 Loading...

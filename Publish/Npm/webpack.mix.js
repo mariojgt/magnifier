@@ -1,5 +1,25 @@
 const mix = require('laravel-mix');
 
+mix.webpackConfig({
+	module: {
+		rules: [
+			// Add support for Vue ref sugar (let ref = $ref())
+			{
+				test: /\.vue$/,
+				loader: "vue-loader",
+				options: {
+					reactivityTransform: true,
+				},
+			},
+			// Add support for <style lang="postcss"> blocks
+			{
+				test: /\.(postcss)$/,
+				use: ["vue-style-loader", { loader: "css-loader", options: { importLoaders: 1 } }, "postcss-loader"],
+			},
+		],
+	},
+});
+
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management

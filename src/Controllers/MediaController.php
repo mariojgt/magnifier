@@ -4,6 +4,7 @@ namespace Mariojgt\Magnifier\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Mariojgt\Magnifier\Models\Media;
@@ -14,12 +15,18 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 class MediaController extends Controller
 {
+	/**
+	 * Start the contructor wit hthe media folder api
+	 */
 	public function __construct()
 	{
-		$this->folderManager = new MediaFolderApiController();
+		$this->folderManager = new MediaFolderController();
 	}
 
 	/**
+	 * Case you are tring to upload from a path, note that $file you need to pass the file as SplFileInfo
+	 * (EXAMPLE)
+	 * $fileinfo = new SplFileInfo('/tmp/foo.txt');
 	 * @param mixed $file
 	 * @param MediaFolder $folder
 	 * @param bool $api
@@ -38,14 +45,18 @@ class MediaController extends Controller
 	}
 
 	/**
+	 * This method you upload from the file input
+	 *
 	 * @param Request $request
 	 * @param MediaFolder $folder
 	 * @param bool $api
 	 *
 	 * @return [json]
 	 */
-	public function upload(Request $request, MediaFolder $folder, $api = true)
+	public function upload(Request $request, $folder)
 	{
+        $folder = MediaFolder::find($folder);
+
 		$request->validate([
 			'file' => 'required|mimes:' . config('media.allowed') . '|max:' . config('media.max_size')
 		]);
@@ -60,13 +71,9 @@ class MediaController extends Controller
 
 		$media = $media->fresh();
 
-		if ($api) {
-			return response()->json([
-				'data' => new MediaResource($media),
-			]);
-		} else {
-			return $media;
-		}
+		return response()->json([
+            'data' => new MediaResource($media),
+        ]);
 	}
 
 
@@ -209,15 +216,19 @@ class MediaController extends Controller
 	 */
 	public function handleFileSource($fileSource, $folder)
 	{
-		// Get the file class type if is SplFileInfo we handle in a differents way
-		if (class_basename($fileSource) == 'SplFileInfo') {
-			// Get the name of the file and slug
-			$file          = pathinfo($fileSource->getFilename(), PATHINFO_FILENAME);
-			$fileExtension = $fileSource->getExtension();
-		} else {
-			// Get the name of the file and slug
-			$file          = pathinfo($fileSource->getClientOriginalName(), PATHINFO_FILENAME);
-			$fileExtension = $fileSource->getClientOriginalExtension();
+		// Check if the file source
+		switch (class_basename($fileSource)) {
+				// Case is a SplFileInfo
+			case 'SplFileInfo':
+				// Get the name of the file and slug
+				$file          = pathinfo($fileSource->getFilename(), PATHINFO_FILENAME);
+				$fileExtension = $fileSource->getExtension();
+				break;
+			default:
+				// Get the name of the file and slug
+				$file          = pathinfo($fileSource->getClientOriginalName(), PATHINFO_FILENAME);
+				$fileExtension = $fileSource->getClientOriginalExtension();
+				break;
 		}
 		// Slug the file name
 		$finalFileName = Str::slug($file, '-');
@@ -227,6 +238,7 @@ class MediaController extends Controller
 		if (!empty($media)) {
 			$media->media_folder_id = $folder->id;
 			$media->save();
+
 			return [
 				'fileExtension' => $fileExtension,
 				'finalFileName' => $finalFileName,
@@ -236,7 +248,7 @@ class MediaController extends Controller
 
 		// Create the database file
 		$media                  = new Media();
-		$media->user_id         = admin()->id ?? 1000;
+		$media->user_id         = 1000;
 		$media->name            = $finalFileName;
 		$media->extension       = $fileExtension;
 		$media->media_folder_id = $folder->id;
@@ -260,8 +272,9 @@ class MediaController extends Controller
 	 *
 	 * @return [true]
 	 */
-	public function mediaDelete(Media $media)
+	public function mediaDelete($media)
 	{
+        $media = Media::find($media);
 		// Get the folder path
 		$path = $this->folderManager->media_path . $media->folder->path . '/';
 

@@ -8,6 +8,16 @@ class MediaFolderResource extends JsonResource
 {
     public function toArray($request)
     {
+
+        $created_at = '';
+        if ($this->created_at) {
+            $created_at = $this->created_at->diffForHumans();
+        }
+        $updated_at = '';
+        if ($this->updated_at) {
+            $updated_at = $this->updated_at->diffForHumans();
+        }
+
         return [
             'id'         => $this->id,
             'name'       => $this->name,
@@ -15,8 +25,8 @@ class MediaFolderResource extends JsonResource
             'count'      => $this->children()->count(),
             'children'   => $this->children(),
             'parent'     => $this->parent(),
-            'created_at' => $this->created_at->diffForHumans(),
-            'updated_at' => $this->updated_at->diffForHumans(),
+            'created_at' => $created_at,
+            'updated_at' => $updated_at,
         ];
     }
 }

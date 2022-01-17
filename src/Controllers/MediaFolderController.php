@@ -65,8 +65,10 @@ class MediaFolderController extends Controller
         }
     }
 
-    public function deleteFolder(MediaFolder $folder)
+    public function deleteFolder($folder)
     {
+        $folder   = MediaFolder::find($folder);
+
         // Check if the folder has children to delete
         if (!empty($folder->children()[0])) {
             $this->deleteChildren($folder->children());
@@ -103,8 +105,10 @@ class MediaFolderController extends Controller
         }
     }
 
-    public function renameFolder(Request $request, MediaFolder $folder)
+    public function renameFolder(Request $request, $folder)
     {
+        $folder   = MediaFolder::find($folder);
+
         // Validate the data
         $request->validate([
             'new_name'      => 'required|max:255|unique:media_folders,name',
@@ -161,8 +165,9 @@ class MediaFolderController extends Controller
         ]);
     }
 
-    public function folderChildren(MediaFolder $folder)
+    public function folderChildren($folder)
     {
+        $folder   = MediaFolder::find($folder);
         $children = $folder->children();
 
         return response()->json([
@@ -172,8 +177,9 @@ class MediaFolderController extends Controller
         ]);
     }
 
-    public function folderFiles(Request $request, MediaFolder $folder)
+    public function folderFiles(Request $request, $folder)
     {
+        $folder = MediaFolder::find($folder);
         $dataReturn = null;
         $order_by   = 'id';
         $order      = 'DESC';
