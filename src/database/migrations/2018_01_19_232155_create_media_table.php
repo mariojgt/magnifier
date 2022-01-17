@@ -25,6 +25,8 @@ class CreateMediaTable extends Migration
                 $table->string('media_size')->nullable();
                 $table->string('caption')->nullable();
                 $table->string('description')->nullable();
+                $table->integer('height')->nullable();
+                $table->integer('width')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
             });

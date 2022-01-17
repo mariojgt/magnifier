@@ -14,36 +14,25 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 class MediaController extends Controller
 {
-    public function __construct()
-    {
-        // Get the media sizes
-        $sizes = [];
-        // If not empty for some reason
-        if (config('media.sizes')) {
-            foreach (config('media.sizes') as $key => $value) {
-                $sizes[] = $key;
-            }
-        }
-        $this->sizes         = $sizes;
+	public function __construct()
+	{
+		$this->folderManager = new MediaFolderApiController();
+	}
 
-        $this->folderManager = new MediaFolderController();
-    }
-/**
+	/**
 	 * @param mixed $file
 	 * @param MediaFolder $folder
 	 * @param bool $api
 	 *
 	 * @return [collection]
 	 */
-	public function uploadPath($file, MediaFolder $folder, $api = true)
+	public function uploadPath($file, MediaFolder $folder)
 	{
-		$ext           = pathinfo($file, PATHINFO_EXTENSION);
-		$tempFile      = basename($file, "." . $ext);
-		$finalFileName = Str::slug($tempFile, '-');
-
+		DB::beginTransaction();
 		// Handle the file source and save in the media library and return the media object and the file extension
 		$fileHandle = $this->handleFileSource($file, $folder);
 		$media      = $this->uploadAction($file, $folder, $fileHandle);
+		DB::commit();
 
 		return $media;
 	}
@@ -100,13 +89,19 @@ class MediaController extends Controller
 
 		// If is a image we goin now to resize the image
 		if (in_array(strtolower($fileExtension), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+
+			// Make a image intervension object
+			$img  = Image::make($fileSource->getRealPath())->orientate();
+
+			// Save the original image height and width
+			$media->height = $img->height();
+			$media->width  = $img->width();
+			$media->save();
+
 			// Loop the config sizes
 			foreach (config('media.sizes') as $key => $mediaSize) {
 				// Build the final file name
 				$finalFile = $finalFileName . '.' . $fileExtension;
-
-				// Make a image intervension object
-				$img  = Image::make($fileSource->getRealPath())->orientate();
 
 				// Resize image, with no upsizing, at the same aspect ratio
 				$img->resize(
@@ -186,8 +181,10 @@ class MediaController extends Controller
 		if (!File::exists($finalAbsolutePath)) {
 			File::makeDirectory($finalAbsolutePath, 0777, true);
 		}
+
 		// Save the original file
-		$fileSource->move($finalAbsolutePath, $finalFile);
+		File::put($finalAbsolutePath . $finalFile, $fileSource);
+
 		return true;
 	}
 
@@ -301,20 +298,20 @@ class MediaController extends Controller
 
 	/**
 	 * 👍👍👍Handle the media update👍👍👍
-     * @param Request $request
-     * @param Media $media
-     *
-     * @return [collection]
-     */
-    public function mediaUpdate(Request $request, Media $media)
-    {
+	 * @param Request $request
+	 * @param Media $media
+	 *
+	 * @return [collection]
+	 */
+	public function mediaUpdate(Request $request, Media $media)
+	{
 
-        $media->title       = Request('title');
-        $media->alt         = Request('alt');
-        $media->caption     = Request('caption');
-        $media->description = Request('description');
-        $media->save();
+		$media->title       = Request('title');
+		$media->alt         = Request('alt');
+		$media->caption     = Request('caption');
+		$media->description = Request('description');
+		$media->save();
 
-        return $media;
-    }
+		return $media;
+	}
 }
