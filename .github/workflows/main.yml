@@ -30,7 +30,6 @@ jobs:
         run: echo Hello, world!
 
       # Runs a set of commands using the runners shell
-      - uses: "finnp/create-file-action@master"
-        env:
-          FILE_NAME: "dir/fileName.txt"
-          FILE_DATA: "file content"
+       - name: Create file
+        run: |
+          echo First        > other.txt
