@@ -1,7 +1,7 @@
 ![image info](https://raw.githubusercontent.com/mariojgt/magnifier/main/Publish/Public/image/magnifier.png)
 # Magnifier
 
-A laravel media manager easy to use an integrate.
+Laravle media manager
 
 # Features
 
