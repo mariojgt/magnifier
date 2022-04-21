@@ -1,4 +1,4 @@
-![image info](https://raw.githubusercontent.com/mariojgt/magnifier/main/Publish/Public/image/magnifier.png)
+![image info](https://raw.githubusercontent.com/mariojgt/magnifier/main/Publish/Public/image/magnifier_new.png)
 # Magnifier
 
 Laravle media manager
