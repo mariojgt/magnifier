@@ -1,8 +1,7 @@
 <template>
-    <div>
+    <div class="cursor-pointer" >
         <img
             :src="item.url['default']"
-            class="h-14 w-14 object-cover rounded-md"
             @click="expandImageLoad(item)"
             alt=""
         />
@@ -32,7 +31,7 @@
                         <div
                             v-bind:style="{
                                 'background-image':
-                                    'url(' + this.item.url[0] + ')',
+                                    'url(' + this.item.url['default'] + ')',
                             }"
                             class="bg-gray-300 h-96 w-full rounded-lg shadow-md bg-cover bg-center"
                         ></div>
@@ -42,7 +41,7 @@
                             <div
                                 class="py-2 text-center font-bold uppercase tracking-wide text-gray-800"
                             >
-                                <a :href="this.item.url[0]" target="_blank">
+                                <a :href="this.item.url['default']" target="_blank">
                                     {{ this.item.name }}
                                 </a>
                             </div>

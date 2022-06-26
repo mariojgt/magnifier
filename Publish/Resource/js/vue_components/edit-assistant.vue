@@ -1,8 +1,7 @@
 <template>
-    <div class="relative py-3 px-1">
         <div class="dropdown dropdown-right">
-            <div tabindex="0" class="m-1">
-                <icon :name="'edit'"> </icon>
+            <div tabindex="0" class="m-1 btn btn-circle modal-button" >
+                <icon :name="'edit'"/>
             </div>
             <ul
                 tabindex="0"
@@ -371,7 +370,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </template>
 <script>
 export default {

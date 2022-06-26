@@ -15,316 +15,316 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 class MediaController extends Controller
 {
-	/**
-	 * Start the contructor wit hthe media folder api
-	 */
-	public function __construct()
-	{
-		$this->folderManager = new MediaFolderController();
-	}
+    /**
+     * Start the contructor wit hthe media folder api
+     */
+    public function __construct()
+    {
+        $this->folderManager = new MediaFolderController();
+    }
 
-	/**
-	 * Case you are tring to upload from a path, note that $file you need to pass the file as SplFileInfo
-	 * (EXAMPLE)
-	 * $fileinfo = new SplFileInfo('/tmp/foo.txt');
-	 * @param mixed $file
-	 * @param MediaFolder $folder
-	 * @param bool $api
-	 *
-	 * @return [collection]
-	 */
-	public function uploadPath($file, MediaFolder $folder)
-	{
-		DB::beginTransaction();
-		// Handle the file source and save in the media library and return the media object and the file extension
-		$fileHandle = $this->handleFileSource($file, $folder);
-		$media      = $this->uploadAction($file, $folder, $fileHandle);
-		DB::commit();
+    /**
+     * Case you are tring to upload from a path, note that $file you need to pass the file as SplFileInfo
+     * (EXAMPLE)
+     * $fileinfo = new SplFileInfo('/tmp/foo.txt');
+     * @param mixed $file
+     * @param MediaFolder $folder
+     * @param bool $api
+     *
+     * @return [collection]
+     */
+    public function uploadPath($file, MediaFolder $folder)
+    {
+        DB::beginTransaction();
+        // Handle the file source and save in the media library and return the media object and the file extension
+        $fileHandle = $this->handleFileSource($file, $folder);
+        $media      = $this->uploadAction($file, $folder, $fileHandle);
+        DB::commit();
 
-		return $media;
-	}
+        return $media;
+    }
 
-	/**
-	 * This method you upload from the file input
-	 *
-	 * @param Request $request
-	 * @param MediaFolder $folder
-	 * @param bool $api
-	 *
-	 * @return [json]
-	 */
-	public function upload(Request $request, $folder)
-	{
+    /**
+     * This method you upload from the file input
+     *
+     * @param Request $request
+     * @param MediaFolder $folder
+     * @param bool $api
+     *
+     * @return [json]
+     */
+    public function upload(Request $request, $folder)
+    {
         $folder = MediaFolder::find($folder);
 
-		$request->validate([
-			'file' => 'required|mimes:' . config('media.allowed') . '|max:' . config('media.max_size')
-		]);
-		$fileSource = Request('file');
+        $request->validate([
+            'file' => 'required|mimes:' . config('media.allowed') . '|max:' . config('media.max_size')
+        ]);
+        $fileSource = Request('file');
 
-		DB::beginTransaction();
-		// Handle the file source and save in the media library and return the media object and the file extension
-		$fileHandle = $this->handleFileSource($fileSource, $folder);
-		$media      = $this->uploadAction($fileSource, $folder, $fileHandle);
+        DB::beginTransaction();
+        // Handle the file source and save in the media library and return the media object and the file extension
+        $fileHandle = $this->handleFileSource($fileSource, $folder);
+        $media      = $this->uploadAction($fileSource, $folder, $fileHandle);
 
-		DB::commit();
+        DB::commit();
 
-		$media = $media->fresh();
+        $media = $media->fresh();
 
-		return response()->json([
+        return response()->json([
             'data' => new MediaResource($media),
         ]);
-	}
+    }
 
 
-	/**
-	 * This fuction handle the upload action for when you use a file path or you upload a file
-	 * @param mixed $fileSource
-	 * @param mixed $folder
-	 *
-	 * @return [type]
-	 */
-	public function uploadAction($fileSource, MediaFolder $folder, $fileHandle)
-	{
-		// Breakdown the fileHandle Array
-		$fileExtension = $fileHandle['fileExtension'];  // File extension
-		$finalFileName = $fileHandle['finalFileName'];  // without extension
-		$media         = $fileHandle['media'];          // Media object
+    /**
+     * This fuction handle the upload action for when you use a file path or you upload a file
+     * @param mixed $fileSource
+     * @param mixed $folder
+     *
+     * @return [type]
+     */
+    public function uploadAction($fileSource, MediaFolder $folder, $fileHandle)
+    {
+        // Breakdown the fileHandle Array
+        $fileExtension = $fileHandle['fileExtension'];  // File extension
+        $finalFileName = $fileHandle['finalFileName'];  // without extension
+        $media         = $fileHandle['media'];          // Media object
 
-		// Where is want to save the image
-		$pathToSave = $this->folderManager->media_path . '' . $folder->path;
+        // Where is want to save the image
+        $pathToSave = $this->folderManager->media_path . '' . $folder->path;
 
-		// If is a image we goin now to resize the image
-		if (in_array(strtolower($fileExtension), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+        // If is a image we goin now to resize the image
+        if (in_array(strtolower($fileExtension), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            // Make a image intervension object
+            $img  = Image::make($fileSource->getRealPath())->orientate();
 
-			// Make a image intervension object
-			$img  = Image::make($fileSource->getRealPath())->orientate();
+            // Save the original image height and width
+            $media->height = $img->height();
+            $media->width  = $img->width();
+            $media->save();
 
-			// Save the original image height and width
-			$media->height = $img->height();
-			$media->width  = $img->width();
-			$media->save();
+            // Loop the config sizes
+            foreach (config('media.sizes') as $key => $mediaSize) {
+                // Build the final file name
+                $finalFile = $finalFileName . '.' . $fileExtension;
 
-			// Loop the config sizes
-			foreach (config('media.sizes') as $key => $mediaSize) {
-				// Build the final file name
-				$finalFile = $finalFileName . '.' . $fileExtension;
+                // Resize image, with no upsizing, at the same aspect ratio
+                $img->resize(
+                    $mediaSize['width'],
+                    $mediaSize['height'],
+                    function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    }
+                );
+                // Build the path the image will be stored based in the sizes
+                $finalAbsolutePath = $pathToSave . '/' . $key . '/';
 
-				// Resize image, with no upsizing, at the same aspect ratio
-				$img->resize(
-					$mediaSize['width'],
-					$mediaSize['height'],
-					function ($constraint) {
-						$constraint->aspectRatio();
-						$constraint->upsize();
-					}
-				);
-				// Build the path the image will be stored based in the sizes
-				$finalAbsolutePath = $pathToSave . '/' . $key . '/';
+                // In here we decide the upload type if is public or aws
+                switch (config('media.disk')) {
+                    case 'public':
+                        $this->handleImagePublicUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
+                        break;
+                    case 'aws':
+                        $this->handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
+                        break;
+                    default:
+                        dd('upload type not allowed');
+                        break;
+                }
+            }
+        } else {
+            // Else is a file just upload to the normal folder
+            $finalFile     = $finalFileName . '.' . $fileExtension;
+            // Build the path the image will be stored based in the sizes
+            $finalAbsolutePath = $pathToSave . '/' . 'documents' . '/';
 
-				// In here we decide the upload type if is public or aws
-				switch (config('media.disk')) {
-					case 'public':
-						$this->handleImagePublicUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
-						break;
-					case 'aws':
-						$this->handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
-						break;
-					default:
-						dd('upload type not allowed');
-						break;
-				}
-			}
-		} else {
-			// Else is a file just upload to the normal folder
-			$finalFile     = $finalFileName . '.' . $fileExtension;
-			// Build the path the image will be stored based in the sizes
-			$finalAbsolutePath = $pathToSave . '/' . 'documents' . '/';
+            // In here we decide the upload type if is public or aws
+            switch (config('media.disk')) {
+                case 'public':
+                    $this->handleFilePublicUpload($fileSource, $finalAbsolutePath, $finalFile);
+                    break;
+                case 'aws':
+                    $this->handleFileAwsUpload($fileSource, $finalAbsolutePath, $finalFile);
+                    break;
+                default:
+                    dd('upload type not allowed');
+                    break;
+            }
+        }
 
-			// In here we decide the upload type if is public or aws
-			switch (config('media.disk')) {
-				case 'public':
-					$this->handleFilePublicUpload($fileSource, $finalAbsolutePath, $finalFile);
-					break;
-				case 'aws':
-					$this->handleFileAwsUpload($fileSource, $finalAbsolutePath, $finalFile);
-					break;
-				default:
-					dd('upload type not allowed');
-					break;
-			}
-		}
+        return $media;
+    }
 
-		return $media;
-	}
+    /* 📁📁 HANDLE THE UPLOAD BASED IN THE TYPES BEGIN 📁📁 */
 
-	/* 📁📁 HANDLE THE UPLOAD BASED IN THE TYPES BEGIN 📁📁 */
+    /* PUBLIC IMAGE UPLOAD */
+    public function handleImagePublicUpload($img, $finalAbsolutePath, $finalFile, $finalFileName)
+    {
+        // Laravel create folder if not exist
+        if (!File::exists($finalAbsolutePath)) {
+            File::makeDirectory($finalAbsolutePath, 0777, true);
+        }
 
-	/* PUBLIC IMAGE UPLOAD */
-	public function handleImagePublicUpload($img, $finalAbsolutePath, $finalFile, $finalFileName)
-	{
-		// Laravel create folder if not exist
-		if (!File::exists($finalAbsolutePath)) {
-			File::makeDirectory($finalAbsolutePath, 0777, true);
-		}
+        // Save the original file
+        $img->save($finalAbsolutePath . $finalFile);
 
-		// Save the original file
-		$img->save($finalAbsolutePath . $finalFile);
+        // Create the webp version
+        if (config('media.use_webp')) {
+            $finalFileWebp = $finalFileName . '.' . 'webp';
+            // Save the webp version
+            $img->encode('webp', 75)->save($finalAbsolutePath . $finalFileWebp);
+        }
 
-		// Create the webp version
-		if (config('media.use_webp')) {
-			$finalFileWebp = $finalFileName . '.' . 'webp';
-			// Save the webp version
-			$img->encode('webp', 75)->save($finalAbsolutePath . $finalFileWebp);
-		}
+        return true;
+    }
 
-		return true;
-	}
+    /* PUBLIC FILE UPLOAD */
+    public function handleFilePublicUpload($fileSource, $finalAbsolutePath, $finalFile)
+    {
+        // Laravel create folder if not exist
+        if (!File::exists($finalAbsolutePath)) {
+            File::makeDirectory($finalAbsolutePath, 0777, true);
+        }
 
-	/* PUBLIC FILE UPLOAD */
-	public function handleFilePublicUpload($fileSource, $finalAbsolutePath, $finalFile)
-	{
-		// Laravel create folder if not exist
-		if (!File::exists($finalAbsolutePath)) {
-			File::makeDirectory($finalAbsolutePath, 0777, true);
-		}
+        // Save the original file
+        File::put($finalAbsolutePath . $finalFile, $fileSource);
 
-		// Save the original file
-		File::put($finalAbsolutePath . $finalFile, $fileSource);
+        return true;
+    }
 
-		return true;
-	}
+    /* AWS IMAGE UPDATE */
+    public function handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName)
+    {
+        dd('implement the logic');
+    }
 
-	/* AWS IMAGE UPDATE */
-	public function handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName)
-	{
-		dd('implement the logic');
-	}
+    /* AWS FILE UPLOAD */
+    public function handleFileAwsUpload($fileSource, $finalAbsolutePath, $finalFile)
+    {
+        dd('implement the logic');
+    }
 
-	/* AWS FILE UPLOAD */
-	public function handleFileAwsUpload($fileSource, $finalAbsolutePath, $finalFile)
-	{
-		dd('implement the logic');
-	}
+    /**
+     * This fuction will get the file upload or by path and retrn the extension and save in the media
+     * @param mixed $fileSource
+     * @param mixed $folder
+     *
+     * @return [type]
+     */
+    public function handleFileSource($fileSource, $folder)
+    {
+        // Check if the file source
+        switch (class_basename($fileSource)) {
+                // Case is a SplFileInfo
+            case 'SplFileInfo':
+                // Get the name of the file and slug
+                $file          = pathinfo($fileSource->getFilename(), PATHINFO_FILENAME);
+                $fileExtension = $fileSource->getExtension();
+                break;
+            default:
+                // Get the name of the file and slug
+                $file          = pathinfo($fileSource->getClientOriginalName(), PATHINFO_FILENAME);
+                $fileExtension = $fileSource->getClientOriginalExtension();
+                break;
+        }
+        // Slug the file name
+        $finalFileName = Str::slug($file, '-');
 
-	/**
-	 * This fuction will get the file upload or by path and retrn the extension and save in the media
-	 * @param mixed $fileSource
-	 * @param mixed $folder
-	 *
-	 * @return [type]
-	 */
-	public function handleFileSource($fileSource, $folder)
-	{
-		// Check if the file source
-		switch (class_basename($fileSource)) {
-				// Case is a SplFileInfo
-			case 'SplFileInfo':
-				// Get the name of the file and slug
-				$file          = pathinfo($fileSource->getFilename(), PATHINFO_FILENAME);
-				$fileExtension = $fileSource->getExtension();
-				break;
-			default:
-				// Get the name of the file and slug
-				$file          = pathinfo($fileSource->getClientOriginalName(), PATHINFO_FILENAME);
-				$fileExtension = $fileSource->getClientOriginalExtension();
-				break;
-		}
-		// Slug the file name
-		$finalFileName = Str::slug($file, '-');
+        // Check if the media already exist just in case
+        $media = Media::where('name', $finalFileName)->first();
+        if (!empty($media)) {
+            $media->media_folder_id = $folder->id;
+            $media->save();
 
-		// Check if the media already exist just in case
-		$media = Media::where('name', $finalFileName)->first();
-		if (!empty($media)) {
-			$media->media_folder_id = $folder->id;
-			$media->save();
+            return [
+                'fileExtension' => $fileExtension,
+                'finalFileName' => $finalFileName,
+                'media'         => $media,
+            ];
+        }
 
-			return [
-				'fileExtension' => $fileExtension,
-				'finalFileName' => $finalFileName,
-				'media'         => $media,
-			];
-		}
+        // Create the database file
+        $media                  = new Media();
+        $media->user_id         = 1000;
+        $media->name            = $finalFileName;
+        $media->extension       = $fileExtension;
+        $media->media_folder_id = $folder->id;
+        $media->media_size      = $fileSource->getSize();
+        $media->disk            = config('media.disk');
+        $media->save();
 
-		// Create the database file
-		$media                  = new Media();
-		$media->user_id         = 1000;
-		$media->name            = $finalFileName;
-		$media->extension       = $fileExtension;
-		$media->media_folder_id = $folder->id;
-		$media->media_size      = $fileSource->getSize();
-		$media->disk            = config('media.disk');
-		$media->save();
+        return [
+            'fileExtension' => $fileExtension,
+            'finalFileName' => $finalFileName,
+            'media'         => $media,
+        ];
+    }
 
-		return [
-			'fileExtension' => $fileExtension,
-			'finalFileName' => $finalFileName,
-			'media'         => $media,
-		];
-	}
-
-	/* 📁📁 HANDLE THE UPLOAD BASED IN THE TYPES END 📁📁*/
+    /* 📁📁 HANDLE THE UPLOAD BASED IN THE TYPES END 📁📁*/
 
 
-	/**
-	 * ❌❌❌Hand the file delete ❌❌❌
-	 * @param Media $media
-	 *
-	 * @return [true]
-	 */
-	public function mediaDelete($media)
-	{
+    /**
+     * ❌❌❌Hand the file delete ❌❌❌
+     * @param Media $media
+     *
+     * @return [true]
+     */
+    public function mediaDelete($media)
+    {
         $media = Media::find($media);
-		// Get the folder path
-		$path = $this->folderManager->media_path . $media->folder->path . '/';
+        // Get the folder path
+        $path = $this->folderManager->media_path . $media->folder->path . '/';
 
-		// If is a image
-		if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
-			foreach (config('media.sizes') as $key => $options) {
-				// Final path with the size
-				$pathFinalPath = $path . $key . '/';
-				// The file to delete
-				$finalFile     = $media->name . '.' . $media->extension;
-				File::delete($pathFinalPath . $finalFile);
+        // If is a image
+        if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            foreach (config('media.sizes') as $key => $options) {
+                // Final path with the size
+                $pathFinalPath = $path . $key . '/';
+                // The file to delete
+                $finalFile     = $media->name . '.' . $media->extension;
+                File::delete($pathFinalPath . $finalFile);
 
-				// Create the webp version
-				if (config('media.use_webp')) {
-					// The file webp version to delete
-					$finalFileWebp = $media->name . '.' . 'webp';
-					File::delete($pathFinalPath . $finalFileWebp);
-				}
-			}
-		} else {
-			// Build the path the image will be stored based in the sizes
-			$finalAbsolutePath = $path . 'documents' . '/';
-			// File name
-			$lookingFile = $media->name . '.' . $media->extension;
-			File::delete($finalAbsolutePath . $lookingFile);
-		}
+                // Create the webp version
+                if (config('media.use_webp')) {
+                    // The file webp version to delete
+                    $finalFileWebp = $media->name . '.' . 'webp';
+                    File::delete($pathFinalPath . $finalFileWebp);
+                }
+            }
+        } else {
+            // Build the path the image will be stored based in the sizes
+            $finalAbsolutePath = $path . 'documents' . '/';
+            // File name
+            $lookingFile = $media->name . '.' . $media->extension;
+            File::delete($finalAbsolutePath . $lookingFile);
+        }
 
-		$media->delete();
+        $media->delete();
 
-		return response()->json([
-			'status' => 'success'
-		]);
-	}
+        return response()->json([
+            'status' => 'success'
+        ]);
+    }
 
-	/**
-	 * 👍👍👍Handle the media update👍👍👍
-	 * @param Request $request
-	 * @param Media $media
-	 *
-	 * @return [collection]
-	 */
-	public function mediaUpdate(Request $request, Media $media)
-	{
+    /**
+     * 👍👍👍Handle the media update👍👍👍
+     * @param Request $request
+     * @param Media $media
+     *
+     * @return [collection]
+     */
+    public function mediaUpdate(Request $request, $media)
+    {
+        $media = Media::findOrFail($media);
 
-		$media->title       = Request('title');
-		$media->alt         = Request('alt');
-		$media->caption     = Request('caption');
-		$media->description = Request('description');
-		$media->save();
+        $media->title       = Request('title');
+        $media->alt         = Request('alt');
+        $media->caption     = Request('caption');
+        $media->description = Request('description');
+        $media->save();
 
-		return $media;
-	}
+        return $media;
+    }
 }

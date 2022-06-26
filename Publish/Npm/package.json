@@ -18,9 +18,7 @@
         "postcss": "^8.2.4",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.32.4",
-        "sass-loader": "^8.0.0"
-    },
-    "dependencies": {
+        "sass-loader": "^8.0.0",
         "daisyui": "^1.16.0",
         "feather-icons": "^4.28.0",
         "sweetalert2": "^9.17.2",

@@ -1,8 +1,6 @@
 // Load vue js
 import { createApp, h } from "vue";
 
-import tabs from "./vue_components/Tabs";
-import Tab from "./vue_components/Tab";
 import sidebar from "./vue_components/side-bar.vue";
 import editassistant from "./vue_components/edit-assistant.vue";
 import mediacontent from "./vue_components/media-content.vue";
@@ -41,8 +39,6 @@ app.mixin({
 });
 
 // Reusable
-app.component("tabs", tabs);
-app.component("tab", Tab);
 app.component("sidebar", sidebar);
 app.component("edit-assistant", editassistant);
 app.component("media-content", mediacontent);

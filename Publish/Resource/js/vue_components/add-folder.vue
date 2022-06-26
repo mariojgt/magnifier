@@ -1,8 +1,11 @@
 <template>
-    <div class="relative py-3 px-1">
-        <label for="my-modal-add-folder">
-            <icon class="w-5 h-5" :name="'plus-circle'"> </icon>
+    <div>
+        <!-- The button to open modal -->
+        <label for="my-modal-add-folder" class="btn btn-circle modal-button">
+            <icon :name="'plus-circle'"> </icon>
         </label>
+
+        <!-- Put this part before </body> tag -->
         <input type="checkbox" id="my-modal-add-folder" class="modal-toggle" />
         <div class="modal">
             <div class="modal-box">
@@ -10,20 +13,11 @@
                     <label class="label">
                         <span class="label-text">Folder Name</span>
                     </label>
-                    <input
-                        type="text"
-                        placeholder="username"
-                        v-model="folder"
-                        class="input input-primary input-bordered"
-                    />
+                    <input type="text" placeholder="username" v-model="folder"
+                        class="input input-primary input-bordered" />
                 </div>
                 <div class="modal-action">
-                    <label
-                        for="my-modal-add-folder"
-                        class="btn btn-primary"
-                        @click="acceptRequest()"
-                        >Create</label
-                    >
+                    <label for="my-modal-add-folder" class="btn btn-primary" @click="acceptRequest()">Create</label>
                     <label for="my-modal-add-folder" class="btn">Close</label>
                 </div>
             </div>
@@ -52,7 +46,7 @@ export default {
                     name: this.folder,
                     parent_id: this.parent_id,
                 })
-                .then(function (response) {})
+                .then(function (response) { })
                 .catch((error) => {
                     if (error.response) {
                         for (const [key, value] of Object.entries(
@@ -73,9 +67,10 @@ export default {
             this.folder = null;
         },
     },
-    created() {},
+    created() { },
     computed: {},
-    mounted() {},
+    mounted() { },
 };
 </script>
-<style></style>
+<style>
+</style>

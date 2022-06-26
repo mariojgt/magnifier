@@ -23,13 +23,14 @@ return [
             //'crop'   => true
         ]
     ],
-    'use_webp'       => true,
-    'disk'           => 'public',
-    'public_path'    => storage_path(),
-    'default_folder' => 'app/public/media/',
-    'default_size'   => 'small',
-    'img_fall_back'  => '/magnifier.png', // path is images/imagename.png so the helper knows
-    'no_image_id'    => '1',
-    'max_size'       => '10048',
-    'allowed'        => 'csv,txt,xlx,xls,pdf,jpeg,png,gif,webp',
+    'use_webp'             => true,
+    'disk'                 => 'public',
+    'public_path'          => storage_path(),
+    'default_folder'       => 'app/public/media/',
+    'default_size'         => 'small',
+    'img_fall_back'        => '/magnifier.png',                          // path is images/imagename.png so the helper knows
+    'no_image_id'          => '1',
+    'max_size'             => '10048',
+    'allowed'              => 'csv,txt,xlx,xls,pdf,jpeg,png,gif,webp',
+    // 'magnifier_middleware' => 'auth',
 ];

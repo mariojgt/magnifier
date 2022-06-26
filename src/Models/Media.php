@@ -30,12 +30,12 @@ class Media extends Model
     }
 
     /**
-	 * Return the paths of the files so we can use in the website
-	 * @return [type]
-	 */
-	public function renderFiles($useFallback = false)
-	{
-		$mediaManager = new MediaApiRenderController();
-		return $mediaManager->renderMediaUrlPath($this, $useFallback);
-	}
+     * Return the paths of the files so we can use in the website
+     * @return [type]
+     */
+    public function renderFiles($useFallback = false)
+    {
+        $mediaManager = new MediaApiRenderController();
+        return $mediaManager->renderMediaUrlPath($this, $useFallback);
+    }
 }
