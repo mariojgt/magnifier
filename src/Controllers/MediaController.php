@@ -60,7 +60,7 @@ class MediaController extends Controller
         $request->validate([
             'file' => 'required|mimes:' . config('media.allowed') . '|max:' . config('media.max_size')
         ]);
-        $fileSource = Request('file');
+        $fileSource = $request->file;
 
         DB::beginTransaction();
         // Handle the file source and save in the media library and return the media object and the file extension
