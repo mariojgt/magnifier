@@ -5,12 +5,16 @@
             <div class="w-full lg:w-auto">
                 <!-- header -->
                 <div class="flex dark:text-white flex-row items-center justify-between px-5 mt-5">
-                    <div class="font-bold text-xl">
-                        Media Folders
-                        <add-folder
-                            v-bind:parent_id="folder_target"
-                            @load_folder="reloadFolder"
-                        ></add-folder>
+                    <div class="flex flex-row items-center">
+                        <div class="flex-1">
+                            Media Folders
+                        </div>
+                        <div class="flex-6">
+                            <add-folder
+                                v-bind:parent_id="folder_target"
+                                @load_folder="reloadFolder"
+                            ></add-folder>
+                        </div>
                     </div>
                 </div>
 
@@ -62,11 +66,11 @@
         } else {
             loadFolder(value.id);
         }
-    }
+    };
     const loadSelectedFolder = async  (item) => {
         loadFolder(item.id);
         folder_target = item.id;
-    }
+    };
     const loadParents = async () => {
         axios.get('folder/list', {
         })
@@ -77,7 +81,7 @@
         })
         .catch(function (error) {
         })
-    }
+    };
     const loadFolder = async (id) => {
         axios.get('/folder/load/'+id, {
         })
@@ -88,7 +92,7 @@
         })
         .catch(function (error) {
         });
-    }
+    };
 
      setTimeout(() => {
         loadParents();
