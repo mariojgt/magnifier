@@ -1,7 +1,7 @@
 ![image info](https://raw.githubusercontent.com/mariojgt/magnifier/main/Publish/Public/image/logo.png)
 # Magnifier
 
-Laravle media manager
+Laravel media manager, the aim of this project is to make it easy to manage media files, this project comes with a fully media library with ui, api and more out of the box stop wasting your time with media library and start using it.
 
 # Features
 
@@ -12,11 +12,12 @@ Laravle media manager
 - [ ] tailwind
 - [ ] dynamic guard protection
 - [ ] dynamic allowed extension
-- [ ] Dark|light mode out of the box
 - [ ] Auto image resize on request
 - [ ] Universal route for file request
 - [ ] Easy to integrate with any laravel project
 - [ ] Api based
+- [ ] Vite support
+- [ ] Plug and play
 
 ### How to install.
 
@@ -25,9 +26,7 @@ First you will need to run the migrations.
 ```art
 composer require mariojgt/magnifier
 
-php artisan migrate
-
-php artisan storage:link
+php artisan install:magnifier
 ```
 
 Once the migration is done you can access the route /magnifier, to protect the routes using a login route you will need to change the config file media.php in the config folder, you can also add some custom sizes.
