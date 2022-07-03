@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Mariojgt\Magnifier\Models\Media;
+use Illuminate\Support\Facades\Storage;
 use Mariojgt\Magnifier\Models\MediaFolder;
 use Mariojgt\Magnifier\Resources\MediaResource;
 use Mariojgt\Magnifier\Resources\MediaFolderResource;
@@ -15,7 +16,7 @@ class MediaFolderController extends Controller
 {
     public function __construct()
     {
-        $this->media_path = config('media.public_path') . '/' . config('media.default_folder');
+        $this->media_path = storage_path(config('media.default_folder'));
     }
 
     public function createFolder(Request $request)
@@ -113,6 +114,7 @@ class MediaFolderController extends Controller
         $request->validate([
             'new_name'      => 'required|max:255|unique:media_folders,name',
         ]);
+
         // Make sure is a valid name
         $newName = Str::slug(Request('new_name'), '-');
         // Get the old path
@@ -133,11 +135,16 @@ class MediaFolderController extends Controller
         $folder->path = $newPath;
         $folder->save();
 
-        // Fisical path rename
+        // Fiscal path rename
         $oldPath = $this->media_path . '' . $oldPath;
         $newPath = $this->media_path . '' . $newPath;
-
-        rename($oldPath, $newPath);
+        // Check if the path exist using Storage
+        if (File::isDirectory($oldPath)) {
+            // Copy the folder to the new path
+            File::copyDirectory($oldPath, $newPath);
+            // Delete the old folder
+            File::deleteDirectory($oldPath);
+        }
 
         return response()->json([
             'data' => $newName,

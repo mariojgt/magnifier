@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $title ?? 'Magnifier Media Manager' }}</title>
-    <link href="{{ asset('vendor/Magnifier/css/app.css') }}" rel="stylesheet">
+    @vite([
+        'resources/vendor/Magnifier/js/app.js',
+        'resources/vendor/Magnifier/js/vue.js',
+        'resources/vendor/Magnifier/sass/app.scss',
+    ])
     @stack('css')
 </head>
 
@@ -17,23 +21,6 @@
             {{ $slot }}
         </div>
     </div>
-
-    <script src="{{ asset('vendor/Magnifier/js/app.js') }}"></script>
-    <script src="{{ asset('vendor/Magnifier/js/vue.js') }}"></script>
-    <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-            });
-    </script>
-
     @stack('js')
 </body>
 

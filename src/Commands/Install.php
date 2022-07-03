@@ -2,9 +2,10 @@
 
 namespace Mariojgt\Magnifier\Commands;
 
-use Illuminate\Console\Command;
 use File;
 use Artisan;
+use Illuminate\Console\Command;
+use Mariojgt\Magnifier\Controllers\MediaFolderController;
 
 class Install extends Command
 {
@@ -50,6 +51,9 @@ class Install extends Command
 
         // Create the storage link
         Artisan::call('storage:link');
+
+        $mediaManager = new MediaFolderController();
+        $mediaManager->makeFolder('media');
 
         // Return a message in the console
         $this->newLine();

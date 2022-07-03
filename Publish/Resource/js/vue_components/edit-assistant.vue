@@ -371,79 +371,79 @@
             </div>
         </div>
 </template>
-<script>
-export default {
-    name: "edit-assistant",
-    props: {
-        item: {
-            type: Object,
-            default: {},
-        },
-    },
-    data: function () {
-        return {
-            enable: false,
-            delete_modal: false,
-            rename_modal: false,
-            folder: "",
-        };
-    },
-    methods: {
-        enableHelper() {
-            if (this.enable) {
-                this.enable = false;
-            } else {
-                this.enable = true;
-            }
-        },
-        deleteModal() {
-            if (this.delete_modal) {
-                this.delete_modal = false;
-            } else {
-                this.delete_modal = true;
-            }
-        },
-        renameModal() {
-            this.folder = this.item.name;
-            if (this.rename_modal) {
-                this.rename_modal = false;
-            } else {
-                this.rename_modal = true;
-            }
-        },
-        acceptRenameRequest() {
-            axios
-                .post("/folder/rename/" + this.item.id, {
-                    new_name: this.folder,
-                })
-                .then(function (response) {})
-                .catch(function (error) {});
+<script setup >
 
-            var item = {
-                id: this.item.parent_id,
-            };
-            this.$emit("load_selected_folder", item);
-            this.renameModal();
-            this.enableHelper();
-        },
-        async acceptRequest() {
-            await axios
-                .delete("folder/delete/" + this.item.id, {})
-                .then((response) => {
-                    //console.log(response);
-                })
-                .catch(function (error) {});
-            var item = {
-                id: this.item.parent_id,
-            };
-            this.$emit("load_selected_folder", item);
-            this.deleteModal();
-            this.enableHelper();
-        },
-    },
-    created() {},
-    computed: {},
-    mounted() {},
-};
+// Props
+const props = defineProps({
+    item: {
+        type: Object,
+        default: []
+    }
+});
+
+let enable = $ref(false);
+let delete_modal = $ref(false);
+let rename_modal = $ref(false);
+let folder = $ref("");
+
+const emit = defineEmits(["load_selected_folder"]);
+
+    const enableHelper = async () => {
+        if (enable) {
+            enable = false;
+        } else {
+            enable = true;
+        }
+    };
+
+    const deleteModal = async () => {
+        if (delete_modal) {
+            delete_modal = false;
+        } else {
+            delete_modal = true;
+        }
+    };
+
+    const renameModal = async () => {
+        folder = props.item.name;
+        if (rename_modal) {
+            rename_modal = false;
+        } else {
+            rename_modal = true;
+        }
+    };
+
+    const acceptRenameRequest = async () => {
+        axios
+            .post("/folder/rename/" + props.item.id, {
+                new_name: folder,
+            })
+            .then(function (response) {})
+            .catch(function (error) {});
+
+        var item = {
+            id: props.item.parent_id,
+        };
+        emit("load_selected_folder", props.item);
+        renameModal();
+        enableHelper();
+    };
+
+    const acceptRequest = async () => {
+        await axios
+            .delete("folder/delete/" + props.item.id, {})
+            .then((response) => {
+                //console.log(response);
+            })
+            .catch(function (error) {});
+        var item = {
+            id: props.item.parent_id,
+        };
+        emit("load_selected_folder", props.item);
+        deleteModal();
+        enableHelper();
+    };
+
+
 </script>
 <style></style>

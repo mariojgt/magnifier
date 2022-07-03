@@ -16,7 +16,7 @@ use Mariojgt\Magnifier\Controllers\MediaFolderController;
 class MediaController extends Controller
 {
     /**
-     * Start the contructor wit hthe media folder api
+     * Start the constructor wit the media folder api
      */
     public function __construct()
     {
@@ -24,7 +24,7 @@ class MediaController extends Controller
     }
 
     /**
-     * Case you are tring to upload from a path, note that $file you need to pass the file as SplFileInfo
+     * Case you are trying to upload from a path, note that $file you need to pass the file as SplFileInfo
      * (EXAMPLE)
      * $fileinfo = new SplFileInfo('/tmp/foo.txt');
      * @param mixed $file
@@ -53,7 +53,7 @@ class MediaController extends Controller
      *
      * @return [json]
      */
-    public function upload(Request $request, $folder)
+    public function upload(Request $request, $folder, $isApi = true)
     {
         $folder = MediaFolder::find($folder);
 
@@ -71,14 +71,18 @@ class MediaController extends Controller
 
         $media = $media->fresh();
 
-        return response()->json([
-            'data' => new MediaResource($media),
-        ]);
+        if ($isApi) {
+            return response()->json([
+                'data' => new MediaResource($media),
+            ]);
+        } else {
+            return $media;
+        }
     }
 
 
     /**
-     * This fuction handle the upload action for when you use a file path or you upload a file
+     * This function handle the upload action for when you use a file path or you upload a file
      * @param mixed $fileSource
      * @param mixed $folder
      *
@@ -94,9 +98,9 @@ class MediaController extends Controller
         // Where is want to save the image
         $pathToSave = $this->folderManager->media_path . '' . $folder->path;
 
-        // If is a image we goin now to resize the image
+        // If is a image we going now to resize the image
         if (in_array(strtolower($fileExtension), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
-            // Make a image intervension object
+            // Make a image intervention object
             $img  = Image::make($fileSource->getRealPath())->orientate();
 
             // Save the original image height and width
@@ -109,7 +113,7 @@ class MediaController extends Controller
                 // Build the final file name
                 $finalFile = $finalFileName . '.' . $fileExtension;
 
-                // Resize image, with no upsizing, at the same aspect ratio
+                // Resize image, with no upspring, at the same aspect ratio
                 $img->resize(
                     $mediaSize['width'],
                     $mediaSize['height'],
@@ -207,7 +211,7 @@ class MediaController extends Controller
     }
 
     /**
-     * This fuction will get the file upload or by path and retrn the extension and save in the media
+     * This function will get the file upload or by path and return the extension and save in the media
      * @param mixed $fileSource
      * @param mixed $folder
      *

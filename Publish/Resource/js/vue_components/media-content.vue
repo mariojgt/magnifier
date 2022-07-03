@@ -15,7 +15,7 @@
                     </span>
                 </div>
                 <div>
-                    <div @click="addFileModal()">
+                    <div @click="addFileModal">
                         <span class="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded">
                             +
                         </span>
@@ -52,17 +52,14 @@
                                             <div class="mt-2">
                                                 <input type="file" multiple
                                                     class="shadow appearance-none border rounded py-2 px-3 text-black"
-                                                    id="file" ref="file" @change="handleFileUpload()" />
+                                                    id="file" ref="file" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                    <button type="button"
-                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                        @click="addFileModal()">
-                                        Cancel
-                                    </button>
+                                    <button class="btn btn-error" @click="addFileModal()" >Cancel</button>
+                                    <button class="btn btn-primary" @click="handleFileUpload" >Upload</button>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +92,7 @@
             class="flex w-full grid-flow-row grid-cols-4 items-center gap-4 overflow-y-hidden overflow-x-scroll px-10 pt-1 pb-10 xl:grid xl:overflow-x-auto xl:px-4 svelte-1n6ue57">
             <div v-for="(item, index) in file" :key="index">
 
-                <div class="card card-compact w-96 bg-base-100 shadow-xl">
+                <div class="card card-compact w-96 bg-base-100 shadow-xl" >
                     <!-- If is image -->
                     <div v-if="extension.includes(item.ext)">
                         <figure>
@@ -140,116 +137,131 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    name: "media-content",
-    props: {
-        parent_id: {
+<script setup>
+
+// Import watch from vue
+import { watch } from 'vue'
+
+// Props
+const props = defineProps({
+  parent_id: {
             type: Number,
             default: null,
         },
-        extension: {
+    extension: {
             type: Array,
             default: ["jpeg", "jpg", "png", "gif", "webp"],
-        },
-    },
-    data: function () {
-        return {
-            file: [],
-            add_modal_file_enable: false,
-            is_loading: false,
-        };
-    },
-    methods: {
-        showModal() {
-            this.unityToast("Drag and drop your file");
-        },
-        async uploadFile(fileRef) {
-            let formData = new FormData();
-            formData.append("file", fileRef);
-            if (this.parent_id == null) {
-                this.unityToast("Select a folder");
-            } else {
-                await axios
-                    .post("/file/upload/" + this.parent_id, formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    })
-                    .catch((error) => {
-                        if (error.response) {
-                            for (const [key, value] of Object.entries(
-                                error.response.data.errors
-                            )) {
-                                this.unityToast(value);
-                            }
-                        }
-                    });
-            }
-        },
-        async handleFileUpload() {
-            // Reference to the files
-            this.loading();
-            for (const [key, value] of Object.entries(this.$refs.file.files)) {
-                await this.uploadFile(value);
-            }
-            this.loadFiles();
-            this.loading();
-            addFileModal();
-        },
-        async drangAndDropFile(e) {
-            let droppedFiles = e.dataTransfer.files;
-            if (!droppedFiles) return;
-            // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
-            this.loading();
-            for (const [key, value] of Object.entries(droppedFiles)) {
-                await this.uploadFile(value);
-            }
-            this.loadFiles();
-            this.loading();
-        },
-        async loadFiles() {
-            if (this.parent_id || this.parent_id === 0) {
-                this.loading();
-                await axios
-                    .get("/folder/files/" + this.parent_id, {})
-                    .then((response) => {
-                        this.file = response.data.data;
-                    })
-                    .catch(function (error) { });
-                this.loading();
-            }
-        },
-        loading() {
-            if (this.is_loading) {
-                this.is_loading = false;
-            } else {
-                this.is_loading = true;
-            }
-        },
-        // Modal to that add files
-        addFileModal() {
-            if (this.add_modal_file_enable) {
-                this.add_modal_file_enable = false;
-            } else {
-                this.add_modal_file_enable = true;
-            }
-        },
-    },
-    watch: {
-        // On prop change we load the files lis
-        parent_id: function (val) {
-            if (val === null) {
-                this.file = [];
-            } else {
-                this.loadFiles();
-            }
-        },
-    },
-    created() { },
-    computed: {},
-    mounted() { },
+        }
+});
+
+// Data
+let file = $ref([]);
+let add_modal_file_enable = $ref(false);
+let is_loading = $ref(false);
+
+
+const showModal = async (id, name) => {
+    window.Toastify({
+        text: "Drag and drop your file",
+        duration: 3000
+    }).showToast();
 };
+
+const uploadFile = async (fileRef) => {
+    let formData = new FormData();
+    formData.append("file", fileRef);
+    if (props.parent_id == null) {
+        window.Toastify({
+            text: "Select a folder",
+            duration: 3000
+        }).showToast();
+    } else {
+        await axios
+            .post("/file/upload/" + props.parent_id, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+            .catch((error) => {
+                if (error.response) {
+                    for (const [key, value] of Object.entries(
+                        error.response.data.errors
+                    )) {
+                        window.Toastify({
+                            text: value,
+                            duration: 3000
+                        }).showToast();
+                    }
+                }
+            });
+    }
+};
+
+const handleFileUpload = async () => {
+    // Reference to the files
+    loading();
+    let files = document.getElementById("file").files;
+    for (const [key, value] of Object.entries(files)) {
+        await uploadFile(value);
+    }
+    loadFiles();
+    loading();
+    addFileModal();
+};
+
+const drangAndDropFile = async (e) => {
+    let droppedFiles = e.dataTransfer.files;
+    if (!droppedFiles) return;
+    // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
+    loading();
+    for (const [key, value] of Object.entries(droppedFiles)) {
+        await uploadFile(value);
+    }
+    loadFiles();
+    loading();
+};
+
+const loadFiles = async (e) => {
+    if (props.parent_id || props.parent_id === 0) {
+        loading();
+        await axios
+            .get("/folder/files/" + props.parent_id, {})
+            .then((response) => {
+                file = response.data.data;
+            })
+            .catch(function (error) { });
+        loading();
+    }
+};
+
+const loading = async (e) => {
+    if (is_loading) {
+        is_loading = false;
+    } else {
+        is_loading = true;
+    }
+};
+
+// Modal to that add files
+const addFileModal = async () => {
+    if (add_modal_file_enable) {
+        add_modal_file_enable = false;
+    } else {
+        add_modal_file_enable = true;
+    }
+};
+
+watch(
+    () => props.parent_id,
+    (val) => {
+       if (val === null) {
+            file = [];
+        } else {
+            loadFiles();
+        }
+    }
+);
+
 </script>
 <style>
 .loader {

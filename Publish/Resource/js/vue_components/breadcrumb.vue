@@ -21,32 +21,26 @@
         </nav>
     </div>
 </template>
-<script>
-    export default {
-      name: "breadcrumb",
-      props: {
+<script setup >
+
+    // Props
+    const props = defineProps({
         breadcrumb: {
           type: Object,
           default: {}
         }
-      },
-      data: function() {
-        return {
-          data: []
-        };
-      },
-      methods: {
-          loadParents () {
-                this.$emit('load_root');
-          },
-          loadFolder(item) {
-            this.$emit('load_selected_folder', item);
-          }
-      },
-      created() {},
-      computed: {},
-      mounted() {}
-    };
+    });
+
+    const emit = defineEmits(['load_root','load_selected_folder']);
+    let data = $ref([]);
+
+    const loadParents = async () => {
+        emit('load_root');
+    }
+    const loadFolder = async () => {
+        emit('load_selected_folder');
+    }
+
 </script>
 <style></style>
 

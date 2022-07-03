@@ -17,21 +17,21 @@
                 <!-- end header -->
                 <sidebar
                     v-for="(item, index) in folders" :key="index"
-                    v-bind:item="item"
+                    :item="item"
                     @load_folder="reloadFolder"
                     @load_selected_folder="loadSelectedFolder"
                 ></sidebar>
             </div>
             <!-- end right section -->
             <!-- left section -->
-            <media-content v-bind:parent_id="folder_target" >
+            <media-content :parent_id="folder_target" >
                 <template #breadcrumb >
-                    <breadcrumb
+                    <pathmaker
                         @load_root="loadParents"
                         @load_selected_folder="loadSelectedFolder"
-                        v-bind:breadcrumb="breadcrumb"
+                        :breadcrumb="breadcrumb"
                     >
-                    </breadcrumb>
+                    </pathmaker>
                 </template>
                 <template #created >
                     {{ folder_created_at }}
@@ -41,67 +41,58 @@
         </div>
     </div>
 </template>
-<script>
-    export default {
-        name: "media-folder",
-        props: {
-            editroute: {
-                type: String,
-                default: ""
-            }
-        },
-        data: function() {
-            return {
-                folders          : [],
-                breadcrumb       : [],
-                folder_target    : null,
-                folder_created_at: '',
-            };
-        },
-        methods: {
-            reloadFolder(value) {
-                if (value.id === null) {
-                    this.loadParents();
-                } else {
-                    this.loadFolder(value.id);
-                }
-            },
-            loadSelectedFolder (item) {
-                this.loadFolder(item.id);
-                this.folder_target = item.id;
-            },
-            loadParents() {
-                axios.get('folder/list', {
-                })
-                .then(response => {
-                    this.folders       = response.data.data;
-                    this.breadcrumb    = [];
-                    this.folder_target = null;
-                })
-                .catch(function (error) {
-                })
-            },
-            loadFolder(id) {
-                axios.get('/folder/load/'+id, {
-                })
-                .then(response => {
-                    this.folders           = response.data.children;
-                    this.breadcrumb        = response.data.parent;
-                    this.folder_created_at = response.data.folder_info.created_at;
-                })
-                .catch(function (error) {
-                });
-            },
+<script setup >
 
-        },
-        created() {},
-        computed: {},
-        mounted() {
-            setTimeout(() => {
-                this.loadParents();
-            }, 1);
+    // Props
+    const props = defineProps({
+        editroute: {
+            type: String,
+            default: ""
         }
-    };
+    });
+
+    let folders           = $ref([]);
+    let breadcrumb        = $ref([]);
+    let folder_target     = $ref(null);
+    let folder_created_at = $ref('');
+
+    const reloadFolder = async (value) => {
+        if (value.id === null) {
+            loadParents();
+        } else {
+            loadFolder(value.id);
+        }
+    }
+    const loadSelectedFolder = async  (item) => {
+        loadFolder(item.id);
+        folder_target = item.id;
+    }
+    const loadParents = async () => {
+        axios.get('folder/list', {
+        })
+        .then(response => {
+            folders       = response.data.data;
+            breadcrumb    = [];
+            folder_target = null;
+        })
+        .catch(function (error) {
+        })
+    }
+    const loadFolder = async (id) => {
+        axios.get('/folder/load/'+id, {
+        })
+        .then(response => {
+            folders           = response.data.children;
+            breadcrumb        = response.data.parent;
+            folder_created_at = response.data.folder_info.created_at;
+        })
+        .catch(function (error) {
+        });
+    }
+
+     setTimeout(() => {
+        loadParents();
+    }, 1);
 </script>
 <style></style>
 

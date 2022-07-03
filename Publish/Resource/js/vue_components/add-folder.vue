@@ -24,53 +24,48 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    name: "edit-assistant",
-    props: {
-        parent_id: {
-            type: Number,
-            default: null,
-        },
-    },
-    data: function () {
-        return {
-            enable: false,
-            folder: "",
-        };
-    },
-    methods: {
-        acceptRequest() {
-            axios
-                .post("folder/create", {
-                    name: this.folder,
-                    parent_id: this.parent_id,
-                })
-                .then(function (response) { })
-                .catch((error) => {
-                    if (error.response) {
-                        for (const [key, value] of Object.entries(
-                            error.response.data.errors
-                        )) {
-                            this.unityToast(value, "#9b2020");
-                        }
-                    }
-                });
-            // Prepare the item
-            var item = {
-                id: this.parent_id,
-            };
+<script setup >
 
-            // Emit the event to load the other folder
-            this.$emit("load_folder", item);
+// Props
+const props = defineProps({
+    parent_id: {
+        type: Number,
+        default: null,
+    }
+});
 
-            this.folder = null;
-        },
-    },
-    created() { },
-    computed: {},
-    mounted() { },
+let enable = $ref(false);
+let folder = $ref("");
+
+const emit = defineEmits(['load_folder']);
+
+const acceptRequest = async () =>{
+    axios
+        .post("folder/create", {
+            name: folder,
+            parent_id: props.parent_id,
+        })
+        .then(function (response) { })
+        .catch((error) => {
+            if (error.response) {
+                for (const [key, value] of Object.entries(
+                    error.response.data.errors
+                )) {
+                    unityToast(value, "#9b2020");
+                }
+            }
+        });
+    // Prepare the item
+    var item = {
+        id: props.parent_id,
+    };
+
+    // Emit the event to load the other folder
+    emit("load_folder", item);
+
+    folder = null;
 };
+
 </script>
 <style>
 </style>

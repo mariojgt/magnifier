@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
-            <add-folder @load_folder="reloadFolder" v-bind:parent_id="this.item.id"/>
+            <add-folder @load_folder="reloadFolder" v-bind:parent_id="item.id"/>
             <edit-assistant @load_selected_folder="reloadFolder" v-bind:item="item"/>
         </div>
     </div>
