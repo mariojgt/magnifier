@@ -15,11 +15,9 @@
 </head>
 
 <body>
-    <div id="app">
-        <div class="content">
-            <x-magnifier::layout.flash />
-            {{ $slot }}
-        </div>
+    <div id="app" >
+        <x-magnifier::layout.flash />
+        {{ $slot }}
     </div>
     @stack('js')
 </body>

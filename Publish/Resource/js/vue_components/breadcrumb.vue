@@ -37,8 +37,8 @@
     const loadParents = async () => {
         emit('load_root');
     }
-    const loadFolder = async () => {
-        emit('load_selected_folder');
+    const loadFolder = async (item) => {
+        emit('load_selected_folder', item);
     }
 
 </script>

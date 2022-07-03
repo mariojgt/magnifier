@@ -13,7 +13,7 @@
                     <label class="label">
                         <span class="label-text">Folder Name</span>
                     </label>
-                    <input type="text" placeholder="username" v-model="folder"
+                    <input type="text" placeholder="Folder Name" v-model="folder"
                         class="input input-primary input-bordered" />
                 </div>
                 <div class="modal-action">

@@ -1,3 +1,3 @@
 <x-magnifier::layout.main>
-    <media> </media>
+    <media/>
 </x-magnifier::layout.main>

@@ -15,12 +15,7 @@
                     </span>
                 </div>
                 <div>
-                    <div @click="addFileModal">
-                        <span class="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded">
-                            +
-                        </span>
-                    </div>
-
+                    <button class="btn btn-primary" @click="addFileModal" >+</button>
                     <!-- modal upload -->
                     <div class="fixed z-10 inset-0 overflow-y-auto" v-if="add_modal_file_enable">
                         <div
