@@ -136,6 +136,7 @@
 
 // Import watch from vue
 import { watch } from 'vue'
+import { startWindToast } from "@mariojgt/wind-notify/packages/index.js";
 
 // Props
 const props = defineProps({
@@ -156,20 +157,14 @@ let is_loading = $ref(false);
 
 
 const showModal = async (id, name) => {
-    window.Toastify({
-        text: "Drag and drop your file",
-        duration: 3000
-    }).showToast();
+    startWindToast('File', 'Drag and drop your file', 'info', 11, 'top');
 };
 
 const uploadFile = async (fileRef) => {
     let formData = new FormData();
     formData.append("file", fileRef);
     if (props.parent_id == null) {
-        window.Toastify({
-            text: "Select a folder",
-            duration: 3000
-        }).showToast();
+        startWindToast('File', 'Select a folder', 'warning', 11, 'top');
     } else {
         await axios
             .post("/file/upload/" + props.parent_id, formData, {
@@ -182,10 +177,7 @@ const uploadFile = async (fileRef) => {
                     for (const [key, value] of Object.entries(
                         error.response.data.errors
                     )) {
-                        window.Toastify({
-                            text: value,
-                            duration: 3000
-                        }).showToast();
+                        startWindToast('info', value, 'info', 11, 'top');
                     }
                 }
             });

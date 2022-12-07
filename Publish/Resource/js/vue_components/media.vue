@@ -18,7 +18,7 @@
 
                 <!-- end header -->
                 <sidebar v-for="(item, index) in folders" :key="index" :item="item" @load_folder="reloadFolder"
-                    @load_selected_folder="loadSelectedFolder"></sidebar>
+                    @load_selected_folder="reloadFolder"></sidebar>
             </div>
             <!-- end right section -->
             <!-- left section -->
@@ -52,7 +52,7 @@ let folder_target = $ref(null);
 let folder_created_at = $ref('');
 
 const reloadFolder = async (value) => {
-    if (value.id === null) {
+    if (!value?.id) {
         loadParents();
     } else {
         loadFolder(value.id);

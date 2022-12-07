@@ -1,6 +1,6 @@
 {
   "resources/vendor/Magnifier/js/app.js": {
-    "file": "assets/app.bec04e3d.js",
+    "file": "assets/app.ad2456cb.js",
     "src": "resources/vendor/Magnifier/js/app.js",
     "isEntry": true,
     "imports": [
@@ -8,21 +8,21 @@
     ]
   },
   "resources/vendor/Magnifier/js/vue.js": {
-    "file": "assets/vue.2ab1c390.js",
+    "file": "assets/vue.53eaf297.js",
     "src": "resources/vendor/Magnifier/js/vue.js",
     "isEntry": true,
     "imports": [
       "__commonjsHelpers.b8add541.js"
     ],
     "css": [
-      "assets/vue.8cc28eb5.css"
+      "assets/vue.de5bbcb1.css"
     ]
   },
   "__commonjsHelpers.b8add541.js": {
     "file": "assets/_commonjsHelpers.b8add541.js"
   },
   "resources/vendor/Magnifier/sass/app.scss": {
-    "file": "assets/app.11b99fc9.css",
+    "file": "assets/app.91dccc98.css",
     "src": "resources/vendor/Magnifier/sass/app.scss",
     "isEntry": true
   }
