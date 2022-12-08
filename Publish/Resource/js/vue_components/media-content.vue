@@ -15,7 +15,7 @@
                     </span>
                 </div>
                 <div>
-                    <button class="btn btn-primary" @click="addFileModal" >+</button>
+                    <button class="btn btn-primary" @click="addFileModal">+</button>
                     <!-- modal upload -->
                     <div class="fixed z-10 inset-0 overflow-y-auto" v-if="add_modal_file_enable">
                         <div
@@ -53,8 +53,8 @@
                                     </div>
                                 </div>
                                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                    <button class="btn btn-error" @click="addFileModal()" >Cancel</button>
-                                    <button class="btn btn-primary" @click="handleFileUpload" >Upload</button>
+                                    <button class="btn btn-error" @click="addFileModal()">Cancel</button>
+                                    <button class="btn btn-primary" @click="handleFileUpload">Upload</button>
                                 </div>
                             </div>
                         </div>
@@ -83,38 +83,45 @@
         </div> -->
         <!-- end categories -->
         <!-- Media list -->
-        <div
-            class="flex w-full grid-flow-row grid-cols-4 items-center gap-4 overflow-y-hidden overflow-x-scroll px-10 pt-1 pb-10 xl:grid xl:overflow-x-auto xl:px-4 svelte-1n6ue57">
-            <div v-for="(item, index) in file" :key="index">
 
-                <div class="card card-compact w-96 bg-base-100 shadow-xl" >
-                    <!-- If is image -->
-                    <div v-if="extension.includes(item.ext)">
-                        <figure>
-                            <image-edit @loading="loading" @load_file="loadFiles" v-bind:item="item" />
-                        </figure>
-                    </div>
-                    <!-- not editable files -->
-                    <div v-else>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-full" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="card-title">{{ item.name }}</h2>
-                        <p>{{ item.ext }}</p>
-                        <div class="card-actions justify-end">
-                            <div class="badge badge-outline">
-                                <a target="_blank" :href="item.url['default']">Download</a>
+        <div class="flow-root p-10">
+            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                <li class="py-3 sm:py-4 border-b transition duration-300 ease-in-out hover:bg-base-200" v-for="(item, index) in file" :key="index">
+                    <div class="flex items-center space-x-4">
+                        <div class="avatar">
+                            <div class="w-24 rounded">
+                                <div v-if="extension.includes(item.ext)">
+                                    <image-edit @loading="loading" @load_file="loadFiles" v-bind:item="item" />
+                                </div>
+                                <!-- not editable files -->
+                                <div v-else>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-full" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
                             </div>
-                            <div class="badge badge-outline">{{ item.media_size }}</div>
-                            <edit-assistant-media @load_folder="loadFiles" v-bind:item="item" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                {{ item.name }}
+                            </p>
+                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                {{ item.ext }}
+                            </p>
+                        </div>
+                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+
+                            <div class="btn-group btn-group-vertical lg:btn-group-horizontal">
+                                <a class="btn btn-active" target="_blank" :href="item.url['default']">Download</a>
+                                <button class="btn">{{ item.media_size }}</button>
+                                <button class="btn btn-error"><edit-assistant-media @load_folder="loadFiles" v-bind:item="item" /></button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </li>
+            </ul>
         </div>
         <!-- end media list -->
 
@@ -140,14 +147,14 @@ import { startWindToast } from "@mariojgt/wind-notify/packages/index.js";
 
 // Props
 const props = defineProps({
-  parent_id: {
-            type: Number,
-            default: null,
-        },
+    parent_id: {
+        type: Number,
+        default: null,
+    },
     extension: {
-            type: Array,
-            default: ["jpeg", "jpg", "png", "gif", "webp"],
-        }
+        type: Array,
+        default: ["jpeg", "jpg", "png", "gif", "webp"],
+    }
 });
 
 // Data
@@ -241,7 +248,7 @@ const addFileModal = async () => {
 watch(
     () => props.parent_id,
     (val) => {
-       if (val === null) {
+        if (val === null) {
             file = [];
         } else {
             loadFiles();

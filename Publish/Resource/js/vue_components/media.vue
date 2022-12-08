@@ -18,7 +18,7 @@
 
                 <!-- end header -->
                 <sidebar v-for="(item, index) in folders" :key="index" :item="item" @load_folder="reloadFolder"
-                    @load_selected_folder="reloadFolder"></sidebar>
+                    @load_selected_folder="loadSelectedFolder"></sidebar>
             </div>
             <!-- end right section -->
             <!-- left section -->
