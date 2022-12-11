@@ -19,4 +19,15 @@ export default defineConfig({
             reactivityTransform: true
         }),
     ],
+    build: {
+        outDir: 'public/vendor/Magnifier',
+        emptyOutDir: true,
+        rollupOptions: {
+            input: {
+                app: 'resources/vendor/Magnifier/js/app.js',
+                vue: 'resources/vendor/Magnifier/js/vue.js',
+                css: 'resources/vendor/Magnifier/sass/app.scss',
+            },
+        },
+    }
 });

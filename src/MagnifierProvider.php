@@ -57,7 +57,7 @@ class MagnifierProvider extends ServiceProvider
 
         // Publish the public folder
         $this->publishes([
-            __DIR__ . '/../Publish/Public/' => public_path('build/')
+            __DIR__ . '/../Publish/Public/' => public_path('vendor/Magnifier/')
         ]);
 
         // Publish the public folder
