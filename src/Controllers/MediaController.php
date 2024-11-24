@@ -5,10 +5,12 @@ namespace Mariojgt\Magnifier\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Mariojgt\Magnifier\Models\Media;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 use Mariojgt\Magnifier\Models\MediaFolder;
 use Mariojgt\Magnifier\Resources\MediaResource;
 use Mariojgt\Magnifier\Controllers\MediaFolderController;
@@ -124,14 +126,13 @@ class MediaController extends Controller
                 );
                 // Build the path the image will be stored based in the sizes
                 $finalAbsolutePath = $pathToSave . '/' . $key . '/';
-
                 // In here we decide the upload type if is public or aws
                 switch (config('media.disk')) {
                     case 'public':
                         $this->handleImagePublicUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
                         break;
                     case 'aws':
-                        $this->handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName);
+                        $this->handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName, $media);
                         break;
                     default:
                         dd('upload type not allowed');
@@ -199,9 +200,45 @@ class MediaController extends Controller
     }
 
     /* AWS IMAGE UPDATE */
-    public function handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName)
+    public function handleAwsImageUpload($img, $finalAbsolutePath, $finalFile, $finalFileName, $media)
     {
-        dd('implement the logic');
+        try {
+            // Ensure the image is encoded
+            $encodedImage = $img->encode();
+            $imageContent = $encodedImage->getEncoded();
+
+            // Construct the S3 path
+            $s3Path = $finalAbsolutePath . $finalFile;
+
+            // Upload to S3
+            $result = Storage::disk('s3')->put($s3Path, $imageContent, [
+                'visibility' => 'public',
+                'ContentType' => $img->mime(),
+            ]);
+
+            if (!$result) {
+                throw new \Exception('File upload to S3 failed.');
+            }
+
+            // Return success response
+            $url = Storage::disk('s3')->url($s3Path);
+            return response()->json(['success' => true, 'url' => $url], 200);
+        } catch (\Throwable $e) {
+            // Log detailed error information
+            Log::error('S3 Upload Error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                's3Path' => $s3Path ?? null,
+                'mime' => $img->mime() ?? null,
+                'bucket' => env('AWS_BUCKET'),
+            ]);
+
+            // Return error response with detailed message
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /* AWS FILE UPLOAD */
