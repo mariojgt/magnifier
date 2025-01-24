@@ -1,286 +1,425 @@
-<template>
-    <div v-cloak @drop.prevent="drangAndDropFile" @dragover.prevent @dragenter="showModal" @dragleave="showModal"
-        class="w-full min-h-screen bg-base-300">
-        <!-- header -->
-        <div class="flex flex-row justify-between items-center px-5 mt-5">
-            <div class="text-gray-800">
-                <div class="font-bold text-xl dark:text-white">Media</div>
-                <slot name="breadcrumb"> </slot>
-            </div>
-            <div class="flex items-center text-black dark:text-white">
-                <div class="text-sm text-center mr-4">
-                    <div class="font-semibold">Created At</div>
-                    <span class="font-semibold">
-                        <slot name="created"> </slot>
-                    </span>
-                </div>
-                <div>
-                    <button class="btn btn-primary" @click="addFileModal">+</button>
-                    <!-- modal upload -->
-                    <div class="fixed z-10 inset-0 overflow-y-auto" v-if="add_modal_file_enable">
-                        <div
-                            class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                            </div>
-
-                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                                aria-hidden="true">&#8203;</span>
-                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-                                role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <div class="sm:flex sm:items-start">
-                                        <div
-                                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                            <!-- Heroicon name: outline/exclamation -->
-                                            <!-- <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg> -->
-
-                                            <icon :class="'h-6 w-6 text-green-600'" :name="'folder'">
-                                            </icon>
-                                        </div>
-                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                                File Upload
-                                            </h3>
-                                            <div class="mt-2">
-                                                <input type="file" multiple
-                                                    class="shadow appearance-none border rounded py-2 px-3 text-black"
-                                                    id="file" ref="file" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                    <button class="btn btn-error" @click="addFileModal()">Cancel</button>
-                                    <button class="btn btn-primary" @click="handleFileUpload">Upload</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End add file modal -->
-                </div>
-            </div>
-        </div>
-        <!-- end header -->
-        <!-- categories -->
-        <!-- <div class="mt-5 flex flex-row px-5">
-            <span
-                class="px-5 py-1 bg-yellow-500 rounded-2xl text-white text-sm mr-4"
-                >
-            All items
-            </span>
-            <span class="px-5 py-1 rounded-2xl text-sm font-semibold mr-4">
-            Food
-            </span>
-            <span class="px-5 py-1 rounded-2xl text-sm font-semibold mr-4">
-            Cold Drinks
-            </span>
-            <span class="px-5 py-1 rounded-2xl text-sm font-semibold mr-4">
-            Hot Drinks
-            </span>
-        </div> -->
-        <!-- end categories -->
-        <!-- Media list -->
-
-        <div class="flow-root p-10">
-            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                <li class="py-3 sm:py-4 border-b transition duration-300 ease-in-out hover:bg-base-200" v-for="(item, index) in file" :key="index">
-                    <div class="flex items-center space-x-4">
-                        <div class="avatar">
-                            <div class="w-24 rounded">
-                                <div v-if="extension.includes(item.ext)">
-                                    <image-edit @loading="loading" @load_file="loadFiles" v-bind:item="item" />
-                                </div>
-                                <!-- not editable files -->
-                                <div v-else>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-full" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                {{ item.name }}
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                {{ item.ext }}
-                            </p>
-                        </div>
-                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-
-                            <div class="btn-group btn-group-vertical lg:btn-group-horizontal">
-                                <a class="btn btn-active" target="_blank" :href="item.url['default']">Download</a>
-                                <button class="btn">{{ item.media_size }}</button>
-                                <button class="btn btn-error"><edit-assistant-media @load_folder="loadFiles" v-bind:item="item" /></button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <!-- end media list -->
-
-        <!-- Loading  -->
-        <!-- v-if="is_loading" -->
-        <div v-if="is_loading"
-            class="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-black opacity-75 flex flex-col items-center justify-center">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-            <h2 class="text-center text-white text-xl font-semibold">
-                Loading...
-            </h2>
-            <p class="w-1/3 text-center text-white">
-                This may take a few seconds, please don't close this page.
-            </p>
-        </div>
-    </div>
-</template>
+<!-- App.vue -->
 <script setup>
+import { ref, watch, onMounted, computed } from 'vue';
+import Toastify from 'toastify-js';
+import {
+ LayoutGrid, List, Upload, File, Image, FolderPlus,
+ Search, Download, FileEdit, Folder, Settings, Film,
+ Music, FileText
+} from 'lucide-vue-next';
+import imageEdit from './media/image-edit.vue';
+import editMedia from './edit-assistant-media.vue';
+import axios from 'axios';
 
-// Import watch from vue
-import { watch } from 'vue'
-import { startWindToast } from "@mariojgt/wind-notify/packages/index.js";
-
-// Props
 const props = defineProps({
-    parent_id: {
-        type: Number,
-        default: null,
-    },
-    extension: {
-        type: Array,
-        default: ["jpeg", "jpg", "png", "gif", "webp"],
-    }
+ parent_id: Number,
+ extension: {
+   type: Array,
+   default: () => ["jpeg", "jpg", "png", "gif", "webp"]
+ }
 });
 
-// Data
-let file = $ref([]);
-let add_modal_file_enable = $ref(false);
-let is_loading = $ref(false);
+// State
+const emit = defineEmits(['select-file']);
+const files = ref([]);
+const uploadModalOpen = ref(false);
+const isLoading = ref(false);
+const selectedView = ref('grid');
+const selectedFile = ref(null);
+const dragActive = ref(false);
+const fileInput = ref(null);
+const searchQuery = ref('');
+const sortBy = ref('name'); // name, date, size
+const sortOrder = ref('asc');
 
-
-const showModal = async (id, name) => {
-    startWindToast('File', 'Drag and drop your file', 'info', 11, 'top');
+// Notifications
+const showToast = (message, type = 'info') => {
+ Toastify({
+   text: message,
+   duration: 3000,
+   position: "top-right",
+   style: {
+     background: type === 'error' ? "#ef4444" :
+                type === 'warning' ? "#f59e0b" : "#3b82f6"
+   }
+ }).showToast();
 };
 
-const uploadFile = async (fileRef) => {
-    let formData = new FormData();
-    formData.append("file", fileRef);
-    if (props.parent_id == null) {
-        startWindToast('File', 'Select a folder', 'warning', 11, 'top');
-    } else {
-        await axios
-            .post("/file/upload/" + props.parent_id, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .catch((error) => {
-                if (error.response) {
-                    for (const [key, value] of Object.entries(
-                        error.response.data.errors
-                    )) {
-                        startWindToast('info', value, 'info', 11, 'top');
-                    }
-                }
-            });
-    }
+// File handling
+const getFileIcon = (ext) => {
+ const type = ext.toLowerCase();
+ if (['jpg','jpeg','png','gif','webp'].includes(type)) return Image;
+ if (['mp4','mov','avi'].includes(type)) return Film;
+ if (['mp3','wav','ogg'].includes(type)) return Music;
+ return FileText;
+};
+
+const loadFiles = async () => {
+ if (props.parent_id === null) return;
+
+ isLoading.value = true;
+ try {
+   const response = await axios.get(`/folder/files/${props.parent_id}`);
+   files.value = response.data.data;
+ } catch (error) {
+   showToast('Error loading files', 'error');
+ }
+ isLoading.value = false;
+};
+
+const sortFiles = computed(() => {
+ return [...files.value].sort((a, b) => {
+   let comparison = 0;
+   if (sortBy.value === 'name') {
+     comparison = a.name.localeCompare(b.name);
+   } else if (sortBy.value === 'date') {
+     comparison = new Date(a.created_at) - new Date(b.created_at);
+   } else if (sortBy.value === 'size') {
+     comparison = parseInt(a.size) - parseInt(b.size);
+   }
+   return sortOrder.value === 'asc' ? comparison : -comparison;
+ });
+});
+
+const filteredFiles = computed(() => {
+ if (!searchQuery.value) return sortFiles.value;
+ const query = searchQuery.value.toLowerCase();
+ return sortFiles.value.filter(file =>
+   file.name.toLowerCase().includes(query) ||
+   file.ext.toLowerCase().includes(query)
+ );
+});
+
+// Upload handling
+const upload = {
+ async single(file) {
+   if (!props.parent_id) {
+     showToast('Select a folder first', 'warning');
+     return;
+   }
+   const formData = new FormData();
+   formData.append("file", file);
+   try {
+     await axios.post(`/file/upload/${props.parent_id}`, formData);
+     showToast('File uploaded successfully', 'success');
+   } catch (error) {
+     if (error.response?.data?.errors) {
+       Object.values(error.response.data.errors)
+         .forEach(msg => showToast(msg, 'error'));
+     }
+   }
+ },
+
+ async multiple(fileList) {
+   isLoading.value = true;
+   for (const file of fileList) {
+     await upload.single(file);
+   }
+   await loadFiles();
+   isLoading.value = false;
+   uploadModalOpen.value = false;
+ }
 };
 
 const handleFileUpload = async () => {
-    // Reference to the files
-    loading();
-    let files = document.getElementById("file").files;
-    for (const [key, value] of Object.entries(files)) {
-        await uploadFile(value);
-    }
-    loadFiles();
-    loading();
-    addFileModal();
+ if (fileInput.value?.files?.length) {
+   await upload.multiple(fileInput.value.files);
+ }
 };
 
-const drangAndDropFile = async (e) => {
-    let droppedFiles = e.dataTransfer.files;
-    if (!droppedFiles) return;
-    // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
-    loading();
-    for (const [key, value] of Object.entries(droppedFiles)) {
-        await uploadFile(value);
-    }
-    loadFiles();
-    loading();
+const handleFileSelect = (file) => {
+ selectedFile.value = file;
+ emit('select-file', file);
 };
 
-const loadFiles = async (e) => {
-    if (props.parent_id || props.parent_id === 0) {
-        loading();
-        await axios
-            .get("/folder/files/" + props.parent_id, {})
-            .then((response) => {
-                file = response.data.data;
-            })
-            .catch(function (error) { });
-        loading();
-    }
-};
+// Watchers & Lifecycle
+watch(() => props.parent_id, val => {
+ val === null ? files.value = [] : loadFiles();
+});
 
-const loading = async (e) => {
-    if (is_loading) {
-        is_loading = false;
-    } else {
-        is_loading = true;
-    }
-};
-
-// Modal to that add files
-const addFileModal = async () => {
-    if (add_modal_file_enable) {
-        add_modal_file_enable = false;
-    } else {
-        add_modal_file_enable = true;
-    }
-};
-
-watch(
-    () => props.parent_id,
-    (val) => {
-        if (val === null) {
-            file = [];
-        } else {
-            loadFiles();
-        }
-    }
-);
-
+onMounted(() => {
+ if (props.parent_id !== null) {
+   loadFiles();
+ }
+});
 </script>
-<style>
-.loader {
-    border-top-color: #000;
-    -webkit-animation: spinner 1.5s linear infinite;
-    animation: spinner 1.5s linear infinite;
+
+<template>
+    <div class="h-full bg-white dark:bg-gray-900">
+      <!-- Header -->
+      <div class="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg
+                  border-b border-gray-200 dark:border-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <!-- View Controls -->
+          <div class="flex items-center gap-3">
+            <div class="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <button @click="selectedView = 'grid'"
+                      :class="[
+                        'p-1.5 rounded-md transition-colors',
+                        selectedView === 'grid'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'hover:bg-white/50 dark:hover:bg-gray-700/50'
+                      ]">
+                <LayoutGrid class="w-4 h-4" />
+              </button>
+              <button @click="selectedView = 'list'"
+                      :class="[
+                        'p-1.5 rounded-md transition-colors',
+                        selectedView === 'list'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'hover:bg-white/50 dark:hover:bg-gray-700/50'
+                      ]">
+                <List class="w-4 h-4" />
+              </button>
+            </div>
+
+            <!-- Sort -->
+            <select v-model="sortBy"
+                    class="px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800
+                           border border-gray-200 dark:border-gray-700
+                           text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="name">Name</option>
+              <option value="date">Date</option>
+              <option value="size">Size</option>
+            </select>
+
+            <div class="h-4 w-px bg-gray-200 dark:bg-gray-700"></div>
+            <span class="text-sm text-gray-500">
+              {{ filteredFiles.length }} items
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <button @click="uploadModalOpen = true"
+                    class="px-3 py-1.5 bg-blue-500 text-white rounded-lg
+                           hover:bg-blue-600 flex items-center gap-2
+                           transition-colors">
+              <Upload class="w-4 h-4" />
+              <span class="text-sm font-medium">Upload</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6">
+        <TransitionGroup
+          tag="div"
+          :class="[
+            selectedView === 'grid'
+              ? 'grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4'
+              : 'flex flex-col divide-y divide-gray-200 dark:divide-gray-700'
+          ]"
+          name="file-grid">
+
+          <!-- Upload Card (Grid only) -->
+          <div v-if="selectedView === 'grid'"
+               key="upload"
+               @click="uploadModalOpen = true"
+               class="aspect-square border-2 border-dashed border-gray-200
+                      dark:border-gray-700 rounded-xl hover:border-blue-500
+                      transition-colors cursor-pointer flex flex-col items-center
+                      justify-center group">
+            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-full
+                        flex items-center justify-center mb-3
+                        group-hover:scale-110 transition-transform">
+              <Upload class="w-6 h-6 text-blue-500" />
+            </div>
+            <span class="text-sm font-medium">Upload Files</span>
+            <span class="text-xs text-gray-500 mt-1">or drag and drop</span>
+          </div>
+
+          <!-- File Items -->
+          <div v-for="file in filteredFiles"
+               :key="file.id"
+               @click="handleFileSelect(file)"
+               class="group relative bg-gray-50 dark:bg-gray-800 rounded-xl
+                      overflow-hidden cursor-pointer"
+               :class="[
+                 selectedView === 'grid' ? 'aspect-square' : 'flex items-center p-3',
+                 selectedFile?.id === file.id ? 'ring-2 ring-blue-500' : ''
+               ]">
+
+            <!-- Thumbnail/Icon -->
+            <div :class="selectedView === 'grid' ? 'aspect-square' : 'w-12 h-12'">
+              <img v-if="extension.includes(file.ext)"
+                   :src="file.url.default"
+                   :alt="file.name"
+                   class="w-full h-full object-cover rounded" />
+              <div v-else
+                   class="w-full h-full flex items-center justify-center">
+                <component :is="getFileIcon(file.ext)"
+                          class="w-8 h-8 text-gray-400" />
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div :class="[
+              'flex flex-col min-w-0',
+              selectedView === 'grid'
+                ? 'absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60'
+                : 'flex-1 ml-4'
+            ]">
+              <span :class="[
+                'font-medium truncate',
+                selectedView === 'grid' ? 'text-white' : ''
+              ]">{{ file.name }}</span>
+              <span :class="[
+                'text-sm',
+                selectedView === 'grid' ? 'text-gray-300' : 'text-gray-500'
+              ]">
+                {{ file.ext.toUpperCase() }} • {{ file.media_size }}
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-1"
+                 :class="[
+                   selectedView === 'grid'
+                     ? 'absolute top-2 right-2 opacity-0 group-hover:opacity-100'
+                     : 'ml-auto',
+                   'transition-opacity'
+                 ]">
+              <a :href="file.url.default"
+                 @click.stop
+                 target="_blank"
+                 class="p-1.5 rounded-lg hover:bg-white/10">
+                <Download class="w-4 h-4" :class="selectedView === 'grid' ? 'text-white' : ''" />
+              </a>
+              <edit-media
+                @click.stop
+                @load_folder="loadFiles"
+                :item="file">
+                <FileEdit class="w-4 h-4" :class="selectedView === 'grid' ? 'text-white' : ''" />
+              </edit-media>
+            </div>
+          </div>
+        </TransitionGroup>
+
+        <!-- Empty State -->
+        <div v-if="!filteredFiles.length && !isLoading"
+             class="flex flex-col items-center justify-center h-64">
+          <File class="w-12 h-12 text-gray-400 mb-4" />
+          <h3 class="text-lg font-medium">No files found</h3>
+          <p class="text-sm text-gray-500 mt-1">
+            Upload files or try a different search
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal and Overlays -->
+      <div v-if="dragActive"
+           class="fixed inset-0 z-50 backdrop-blur-sm bg-black/20
+                  flex items-center justify-center">
+        <!-- Drag & Drop Overlay -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl
+                    max-w-lg w-full mx-4 text-center">
+          <div class="w-20 h-20 bg-blue-50 dark:bg-blue-500/10 rounded-full
+                      flex items-center justify-center mx-auto mb-4">
+            <Upload class="w-10 h-10 text-blue-500 animate-bounce" />
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Drop files to upload
+          </h3>
+          <p class="text-gray-500 dark:text-gray-400">
+            Release to upload your files to the current folder
+          </p>
+        </div>
+      </div>
+
+      <!-- Upload Modal -->
+      <dialog class="modal modal-bottom sm:modal-middle"
+              :open="uploadModalOpen">
+        <div class="modal-box max-w-2xl">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-50 dark:bg-blue-500/10 rounded-full
+                          flex items-center justify-center">
+                <Upload class="w-5 h-5 text-blue-500" />
+              </div>
+              <h3 class="text-xl font-semibold">Upload Files</h3>
+            </div>
+            <button @click="uploadModalOpen = false"
+                    class="btn btn-ghost btn-sm btn-circle">×</button>
+          </div>
+
+          <div class="space-y-4">
+            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600
+                        rounded-xl p-8 text-center">
+              <input type="file"
+                     ref="fileInput"
+                     multiple
+                     class="hidden"
+                     @change="handleFileUpload" />
+              <button @click="fileInput?.click()"
+                      class="px-4 py-2 bg-blue-500 text-white rounded-lg
+                             hover:bg-blue-600 mb-3">
+                Choose Files
+              </button>
+              <p class="text-sm text-gray-500">
+                or drag and drop files here
+              </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button @click="uploadModalOpen = false"
+                      class="btn btn-ghost">
+                Cancel
+              </button>
+              <button @click="handleFileUpload"
+                      :disabled="isLoading || !fileInput?.files?.length"
+                      class="btn btn-primary">
+                <span v-if="isLoading" class="loading loading-spinner loading-sm" />
+                {{ isLoading ? 'Uploading...' : 'Upload' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop bg-black/50" @click="uploadModalOpen = false" />
+      </dialog>
+
+      <!-- Loading Overlay -->
+      <div v-if="isLoading"
+           class="fixed inset-0 bg-black/20 backdrop-blur-sm
+                  flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl text-center">
+          <div class="loading loading-spinner loading-lg mb-4" />
+          <h3 class="text-lg font-semibold">Processing Files</h3>
+          <p class="text-sm text-gray-500 mt-2">Please wait a moment...</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+<style scoped>
+.file-grid-move {
+ transition: all 0.3s ease;
 }
 
-@-webkit-keyframes spinner {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+.file-grid-enter-active,
+.file-grid-leave-active {
+ transition: all 0.3s ease;
 }
 
-@keyframes spinner {
-    0% {
-        transform: rotate(0deg);
-    }
+.file-grid-enter-from,
+.file-grid-leave-to {
+ opacity: 0;
+ transform: scale(0.95);
+}
 
-    100% {
-        transform: rotate(360deg);
-    }
+.loading {
+ @apply animate-spin rounded-full border-4 border-blue-500 border-r-transparent;
+}
+
+@keyframes bounce {
+ 0%, 100% {
+   transform: translateY(-25%);
+   animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+ }
+ 50% {
+   transform: translateY(0);
+   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+ }
 }
 </style>

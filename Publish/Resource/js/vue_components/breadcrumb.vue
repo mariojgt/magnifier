@@ -1,46 +1,74 @@
-<template>
-    <div>
-        <nav class="text-black dark:text-white font-bold my-8" aria-label="Breadcrumb">
-            <ol class="list-none p-0 inline-flex">
-                <li class="flex items-center cursor-pointer" @click="loadParents()" >
-                    <icon class="w-5 h-5" :name="'home'" > </icon>
-                    <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                        <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
-                    </svg>
-                </li>
+<script setup>
+import { ref } from 'vue';
+import { Home, ChevronRight, Folder } from 'lucide-vue-next';
 
-                <li v-for="(item, index) in breadcrumb" :key="index"
-                    @click="loadFolder(item)"
-                    class="flex items-center">
-                    <a href="#">{{ item.name }}</a>
-                    <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                        <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
-                    </svg>
-                </li>
-            </ol>
-        </nav>
-    </div>
-</template>
-<script setup >
+const props = defineProps({
+ breadcrumb: {
+   type: Object,
+   default: {}
+ }
+});
 
-    // Props
-    const props = defineProps({
-        breadcrumb: {
-          type: Object,
-          default: {}
-        }
-    });
+const emit = defineEmits(['load_root', 'load_selected_folder']);
+const hoveredIndex = ref(null);
 
-    const emit = defineEmits(['load_root','load_selected_folder']);
-    let data = $ref([]);
-
-    const loadParents = async () => {
-        emit('load_root');
-    }
-    const loadFolder = async (item) => {
-        emit('load_selected_folder', item);
-    }
-
+const loadParents = () => emit('load_root');
+const loadFolder = (item) => emit('load_selected_folder', item);
 </script>
-<style></style>
 
+<template>
+ <nav class="flex items-center py-2 px-4 bg-base-200/50 backdrop-blur
+             rounded-lg shadow-sm overflow-x-auto">
+   <!-- Home -->
+   <button @click="loadParents"
+           @mouseenter="hoveredIndex = -1"
+           @mouseleave="hoveredIndex = null"
+           class="flex items-center min-w-fit px-2 py-1 rounded-md
+                  transition-all duration-200 hover:bg-primary/10
+                  relative group">
+     <Home class="w-4 h-4 text-primary" />
+     <span class="ml-2 text-sm font-medium">Home</span>
+
+     <div v-if="hoveredIndex === -1"
+          class="absolute inset-0 border-2 border-primary/30
+                 rounded-md scale-105 animate-pulse"/>
+   </button>
+
+   <!-- Separator after home -->
+   <ChevronRight v-if="breadcrumb?.length"
+                 class="w-4 h-4 mx-2 text-base-content/30" />
+
+   <!-- Breadcrumb items -->
+   <div class="flex items-center space-x-2 overflow-x-auto">
+     <template v-for="(item, index) in breadcrumb" :key="index">
+       <button @click="loadFolder(item)"
+               @mouseenter="hoveredIndex = index"
+               @mouseleave="hoveredIndex = null"
+               class="flex items-center min-w-fit px-2 py-1 rounded-md
+                      transition-all duration-200 hover:bg-primary/10
+                      relative group whitespace-nowrap">
+         <Folder class="w-4 h-4 text-primary/70 mr-2" />
+         <span class="text-sm font-medium">{{ item.name }}</span>
+
+         <div v-if="hoveredIndex === index"
+              class="absolute inset-0 border-2 border-primary/30
+                     rounded-md scale-105 animate-pulse"/>
+       </button>
+
+       <ChevronRight v-if="index < breadcrumb.length - 1"
+                    class="w-4 h-4 text-base-content/30 shrink-0" />
+     </template>
+   </div>
+ </nav>
+</template>
+
+<style scoped>
+.animate-pulse {
+ animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+ 0%, 100% { opacity: 1; }
+ 50% { opacity: .5; }
+}
+</style>

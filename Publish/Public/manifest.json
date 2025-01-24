@@ -1,33 +1,16 @@
 {
-  "__commonjsHelpers-725317a4.js": {
-    "file": "assets/_commonjsHelpers-725317a4.js"
-  },
-  "resources/vendor/Magnifier/js/app.js": {
-    "file": "assets/app-20eb5df8.js",
-    "imports": [
-      "__commonjsHelpers-725317a4.js"
-    ],
-    "isEntry": true,
-    "src": "resources/vendor/Magnifier/js/app.js"
-  },
-  "resources/vendor/Magnifier/js/vue.css": {
-    "file": "assets/vue-0b5ac529.css",
-    "src": "resources/vendor/Magnifier/js/vue.css"
-  },
   "resources/vendor/Magnifier/js/vue.js": {
-    "css": [
-      "assets/vue-0b5ac529.css"
-    ],
-    "file": "assets/vue-ada0bc10.js",
-    "imports": [
-      "__commonjsHelpers-725317a4.js"
-    ],
+    "file": "assets/vue-D6mxO582.js",
+    "name": "vue",
+    "src": "resources/vendor/Magnifier/js/vue.js",
     "isEntry": true,
-    "src": "resources/vendor/Magnifier/js/vue.js"
+    "css": [
+      "assets/vue-YFrjvVjE.css"
+    ]
   },
   "resources/vendor/Magnifier/sass/app.scss": {
-    "file": "assets/app-30751de3.css",
-    "isEntry": true,
-    "src": "resources/vendor/Magnifier/sass/app.scss"
+    "file": "assets/css-BbgV_s54.css",
+    "src": "resources/vendor/Magnifier/sass/app.scss",
+    "isEntry": true
   }
 }

@@ -4,14 +4,14 @@
     "dev": "vite",
     "build": "vite build"
   },
+  "type": "module",
   "devDependencies": {
     "@vue-macros/reactivity-transform": "^0.4.3",
     "@vue/compiler-sfc": "^3.0.5",
     "autoprefixer": "^10.4.7",
     "axios": "^1.2.0",
     "cross-env": "^7.0",
-    "feather-icons": "^4.28.0",
-    "laravel-vite-plugin": "^0.7.4",
+    "laravel-vite-plugin": "^1.2.0",
     "lodash": "^4.17.19",
     "naive-ui": "^2.34.3",
     "postcss": "^8.4.14",
@@ -20,21 +20,21 @@
     "sass-loader": "^13.0.0",
     "tailwindcss": "^3.1.4",
     "vfonts": "^0.0.3",
-    "vite": "^4.1.4"
+    "vite": "^6.0.11"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.12",
     "@inertiajs/vue3": "^1.0.2",
-    "@jamescoyle/vue-icon": "^0.1.2",
-    "@mariojgt/masterui": "^0.3.0",
+    "@mariojgt/masterui": "^0.5.5",
+    "@mariojgt/wind-notify": "^0.0.3",
     "@mdi/js": "^7.0.96",
     "@vitejs/plugin-vue": "^4.0.0",
     "daisyui": "^4.7.2",
+    "lucide-vue-next": "^0.474.0",
     "sortablejs": "^1.15.0",
-    "vue": "^3.2.45",
-    "vue-loader": "^17.0.1",
-    "@mariojgt/wind-notify": "^0.0.3",
     "sweetalert2": "^9.17.2",
-    "toastify-js": "^1.9.3"
+    "toastify-js": "^1.9.3",
+    "vue": "^3.5.1",
+    "vue-loader": "^17.0.1"
   }
 }
