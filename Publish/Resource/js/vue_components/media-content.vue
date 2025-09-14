@@ -1,7 +1,8 @@
 <!-- App.vue -->
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import Toastify from 'toastify-js';
+import { toast, toastError, toastSuccess, showHttpError } from '../utils/notify';
 import {
  LayoutGrid, List, Upload, File, Image, FolderPlus,
  Search, Download, FileEdit, Folder, Settings, Film,
@@ -16,6 +17,10 @@ const props = defineProps({
  extension: {
    type: Array,
    default: () => ["jpeg", "jpg", "png", "gif", "webp"]
+ },
+ search: {
+   type: String,
+   default: ''
  }
 });
 
@@ -27,23 +32,15 @@ const isLoading = ref(false);
 const selectedView = ref('grid');
 const selectedFile = ref(null);
 const dragActive = ref(false);
+const dragCounter = ref(0);
 const fileInput = ref(null);
 const searchQuery = ref('');
+let searchTimer = null;
 const sortBy = ref('name'); // name, date, size
 const sortOrder = ref('asc');
 
 // Notifications
-const showToast = (message, type = 'info') => {
- Toastify({
-   text: message,
-   duration: 3000,
-   position: "top-right",
-   style: {
-     background: type === 'error' ? "#ef4444" :
-                type === 'warning' ? "#f59e0b" : "#3b82f6"
-   }
- }).showToast();
-};
+const showToast = (message, type = 'info') => toast(message, type);
 
 // File handling
 const getFileIcon = (ext) => {
@@ -55,27 +52,48 @@ const getFileIcon = (ext) => {
 };
 
 const loadFiles = async () => {
- if (props.parent_id === null) return;
+  // If no folder is selected but there's a query, use global search
+  if ((props.parent_id === null || props.parent_id === undefined) && searchQuery.value) {
+    isLoading.value = true;
+    try {
+      const params = { s: searchQuery.value };
+      const response = await axios.get(`/media/search`, { params });
+      const list = Array.isArray(response?.data?.data) ? response.data.data : [];
+      files.value = list;
+    } catch (error) {
+      showHttpError(error, 'Error searching files');
+    }
+    isLoading.value = false;
+    return;
+  }
 
- isLoading.value = true;
- try {
-   const response = await axios.get(`/folder/files/${props.parent_id}`);
-   files.value = response.data.data;
- } catch (error) {
-   showToast('Error loading files', 'error');
- }
- isLoading.value = false;
+  if (props.parent_id === null) return;
+
+  isLoading.value = true;
+  try {
+    const params = {};
+    if (searchQuery.value) params.s = searchQuery.value;
+    const response = await axios.get(`/folder/files/${props.parent_id}`, { params });
+    const list = Array.isArray(response?.data?.data) ? response.data.data : [];
+    files.value = list;
+  } catch (error) {
+    showHttpError(error, 'Error loading files');
+  }
+  isLoading.value = false;
 };
 
 const sortFiles = computed(() => {
- return [...files.value].sort((a, b) => {
+ const source = Array.isArray(files.value) ? files.value : [];
+ return [...source].sort((a, b) => {
    let comparison = 0;
    if (sortBy.value === 'name') {
      comparison = a.name.localeCompare(b.name);
    } else if (sortBy.value === 'date') {
      comparison = new Date(a.created_at) - new Date(b.created_at);
    } else if (sortBy.value === 'size') {
-     comparison = parseInt(a.size) - parseInt(b.size);
+     // media_size comes as humanized string; fallback to length comparison
+     const toBytes = (s) => (typeof s === 'number' ? s : parseFloat(String(s))) || 0;
+     comparison = toBytes(a.media_size) - toBytes(b.media_size);
    }
    return sortOrder.value === 'asc' ? comparison : -comparison;
  });
@@ -101,23 +119,26 @@ const upload = {
    formData.append("file", file);
    try {
      await axios.post(`/file/upload/${props.parent_id}`, formData);
-     showToast('File uploaded successfully', 'success');
+     toastSuccess('File uploaded successfully');
    } catch (error) {
-     if (error.response?.data?.errors) {
-       Object.values(error.response.data.errors)
-         .forEach(msg => showToast(msg, 'error'));
-     }
+     showHttpError(error, 'The file failed to upload.');
+     throw error;
    }
  },
 
  async multiple(fileList) {
    isLoading.value = true;
+   let anyFailed = false;
    for (const file of fileList) {
-     await upload.single(file);
+     try {
+       await upload.single(file);
+     } catch (_) {
+       anyFailed = true;
+     }
    }
    await loadFiles();
    isLoading.value = false;
-   uploadModalOpen.value = false;
+   uploadModalOpen.value = anyFailed; // keep open if something failed
  }
 };
 
@@ -137,15 +158,74 @@ watch(() => props.parent_id, val => {
  val === null ? files.value = [] : loadFiles();
 });
 
+// Initialize from parent prop with debounce reload
+watch(() => props.search, (val) => {
+  searchQuery.value = val || '';
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    if (props.parent_id !== null) {
+      loadFiles();
+    }
+  }, 250);
+}, { immediate: true });
+
 onMounted(() => {
  if (props.parent_id !== null) {
    loadFiles();
  }
+  // Global drag-and-drop listeners so dropping anywhere triggers upload
+  window.addEventListener('dragover', onDragOver);
+  window.addEventListener('dragenter', onDragEnter);
+  window.addEventListener('dragleave', onDragLeave);
+  window.addEventListener('drop', onDrop);
+  window.addEventListener('dragend', onDrop); // fallback cleanup
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener('dragover', onDragOver);
+  window.removeEventListener('dragenter', onDragEnter);
+  window.removeEventListener('dragleave', onDragLeave);
+  window.removeEventListener('drop', onDrop);
+  window.removeEventListener('dragend', onDrop);
+});
+
+// Drag & Drop handlers
+const isFileDrag = (e) => Array.from(e?.dataTransfer?.types || []).includes('Files');
+const onDragOver = (e) => {
+  // Necessary to allow drop
+  e.preventDefault();
+};
+const onDragEnter = (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  dragCounter.value += 1;
+  dragActive.value = true;
+};
+const onDragLeave = (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  dragCounter.value = Math.max(0, dragCounter.value - 1);
+  if (dragCounter.value === 0) dragActive.value = false;
+};
+const onDrop = async (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  const dt = e.dataTransfer;
+  dragCounter.value = 0;
+  dragActive.value = false;
+
+  if (!props.parent_id) {
+    showToast('Select a folder first', 'warning');
+    return;
+  }
+  const files = dt?.files;
+  if (!files || files.length === 0) return;
+  await upload.multiple(files);
+};
 </script>
 
 <template>
-    <div class="h-full bg-white dark:bg-gray-900">
+  <div class="h-full bg-white dark:bg-gray-900">
       <!-- Header -->
       <div class="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg
                   border-b border-gray-200 dark:border-gray-700">
@@ -309,7 +389,7 @@ onMounted(() => {
       </div>
 
       <!-- Modal and Overlays -->
-      <div v-if="dragActive"
+  <div v-if="dragActive"
            class="fixed inset-0 z-50 backdrop-blur-sm bg-black/20
                   flex items-center justify-center">
         <!-- Drag & Drop Overlay -->
@@ -392,7 +472,7 @@ onMounted(() => {
     </div>
   </template>
 
-<style scoped>
+<style scoped lang="postcss">
 .file-grid-move {
  transition: all 0.3s ease;
 }

@@ -3,10 +3,10 @@ import { ref } from 'vue';
 import { Home, ChevronRight, Folder } from 'lucide-vue-next';
 
 const props = defineProps({
- breadcrumb: {
-   type: Object,
-   default: {}
- }
+  breadcrumb: {
+    type: Array,
+    default: () => []
+  }
 });
 
 const emit = defineEmits(['load_root', 'load_selected_folder']);

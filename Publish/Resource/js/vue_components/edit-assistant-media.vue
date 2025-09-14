@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { Trash2, X } from 'lucide-vue-next';
 import axios from 'axios';
 import Toastify from 'toastify-js';
+import { toastSuccess, showHttpError } from '../utils/notify';
 
 const props = defineProps({
  item: {
@@ -22,18 +23,14 @@ const showDeleteModal = () => {
 const confirmDelete = async () => {
  try {
    isDeleting.value = true;
-   await axios.delete(`/file/delete/${props.item.id}`);
+   const mode = (typeof localStorage !== 'undefined' && localStorage.getItem('magnifier.storage_mode')) || 'local';
+   await axios.delete(`/file/delete/${props.item.id}`, {
+     headers: { 'X-Magnifier-Mode': mode }
+   });
    emit('load_folder');
-   Toastify({
-     text: "File deleted successfully",
-     duration: 3000,
-     style: { background: "#10B981" }
-   }).showToast();
+  toastSuccess('File deleted successfully');
  } catch (error) {
-   Toastify({
-     text: "Error deleting file",
-     style: { background: "#EF4444" }
-   }).showToast();
+   showHttpError(error, 'Error deleting file');
  } finally {
    isDeleting.value = false;
    isOpen.value = false;

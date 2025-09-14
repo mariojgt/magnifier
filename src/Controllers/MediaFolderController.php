@@ -14,6 +14,11 @@ use Mariojgt\Magnifier\Resources\MediaFolderResource;
 
 class MediaFolderController extends Controller
 {
+    /**
+     * Absolute base path on disk where media folders/files are stored.
+     */
+    public $media_path;
+
     public function __construct()
     {
         $this->media_path = storage_path(config('media.default_folder'));

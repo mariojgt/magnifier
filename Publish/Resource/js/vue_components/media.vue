@@ -1,6 +1,6 @@
 <!-- App.vue -->
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import {
  Folder, Home, File, ChevronRight, Plus, Download, Trash2,
  LayoutGrid, List, Search, Settings, Moon, Sun, FolderOpen
@@ -10,6 +10,7 @@ import addFolder from './add-folder.vue';
 import sidebar from './side-bar.vue';
 import pathmaker from './breadcrumb.vue';
 import mediaContent from './media-content.vue';
+import { showHttpError } from '../utils/notify';
 
 const isDark = ref(false);
 const searchQuery = ref('');
@@ -17,6 +18,18 @@ const sidebarWidth = ref(240);
 const showPreview = ref(true);
 const selectedFile = ref(null);
 const selectedView = ref('grid');
+// storage mode: 'local' | 's3'
+const storageMode = ref(localStorage.getItem('magnifier.storage_mode') || 'local');
+
+// apply header for backend to switch mode
+axios.defaults.headers.common['X-Magnifier-Mode'] = storageMode.value;
+
+watch(storageMode, (val) => {
+  localStorage.setItem('magnifier.storage_mode', val);
+  axios.defaults.headers.common['X-Magnifier-Mode'] = val;
+  // reload current folder to reflect mode (URLs may differ)
+  folder_target ? loadFolder(folder_target) : loadParents();
+});
 
 let folders = $ref([]);
 let breadcrumb = $ref([]);
@@ -30,23 +43,23 @@ const toggleTheme = () => {
 
 const loadFolder = async (id) => {
  try {
-   const response = await axios.get(`/folder/load/${id}`);
+  const response = await axios.get(`/folder/load/${id}`);
    folders = response.data.children;
    breadcrumb = response.data.parent;
    folder_created_at = response.data.folder_info.created_at;
  } catch (error) {
-   console.error('Error loading folder:', error);
+  showHttpError(error, 'Error loading folder');
  }
 };
 
 const loadParents = async () => {
  try {
-   const response = await axios.get('folder/list');
+  const response = await axios.get('/folder/list');
    folders = response.data.data;
    breadcrumb = [];
    folder_target = null;
  } catch (error) {
-   console.error('Error loading parents:', error);
+  showHttpError(error, 'Error loading folders');
  }
 };
 
@@ -96,6 +109,20 @@ onMounted(() => {
 
      <!-- View Controls -->
      <div class="flex items-center gap-2">
+        <!-- Storage mode toggle -->
+        <div class="flex items-center gap-1 mr-2">
+          <span class="text-xs text-gray-500 dark:text-gray-400">Storage:</span>
+          <button class="px-2 py-1 rounded-md text-xs"
+                  :class="storageMode === 'local' ? 'bg-gray-200 dark:bg-gray-700' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
+                  @click="storageMode = 'local'">
+            Local
+          </button>
+          <button class="px-2 py-1 rounded-md text-xs"
+                  :class="storageMode === 's3' ? 'bg-gray-200 dark:bg-gray-700' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
+                  @click="storageMode = 's3'">
+            S3
+          </button>
+        </div>
        <button class="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
                @click="selectedView = 'grid'"
                :class="{ 'bg-gray-200 dark:bg-gray-700': selectedView === 'grid' }">
@@ -166,6 +193,7 @@ onMounted(() => {
 
        <media-content :parent_id="folder_target"
                      :view="selectedView"
+                     :search="searchQuery"
                      @select-file="selectedFile = $event"
                      class="flex-1">
          <template #created>
@@ -179,19 +207,24 @@ onMounted(() => {
           class="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50
                  dark:bg-gray-800/50">
        <div v-if="selectedFile" class="p-4">
-         <div class="aspect-square mb-4 bg-white dark:bg-gray-800 rounded-lg
-                     overflow-hidden">
-           <img :src="selectedFile.url"
-                :alt="selectedFile.name"
-                class="w-full h-full object-cover" />
-         </div>
+        <div class="aspect-square mb-4 bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+          <img :src="selectedFile.url?.medium || selectedFile.url?.default"
+               :alt="selectedFile.alt || selectedFile.name"
+               class="w-full h-full object-cover" />
+        </div>
          <div class="space-y-4">
            <div>
              <h3 class="font-medium">{{ selectedFile.name }}</h3>
-             <p class="text-sm text-gray-500">{{ selectedFile.size }}</p>
+         <p class="text-sm text-gray-500">{{ selectedFile.media_size }}</p>
            </div>
            <div class="flex gap-2">
-             <button class="btn btn-primary btn-sm flex-1">Download</button>
+             <a :href="selectedFile.url?.default"
+                :download="selectedFile.name"
+                target="_blank"
+                rel="noopener"
+                class="btn btn-primary btn-sm flex-1 text-center">
+               Download
+             </a>
              <button class="btn btn-outline btn-sm">Share</button>
            </div>
          </div>
@@ -205,7 +238,7 @@ onMounted(() => {
  </div>
 </template>
 
-<style>
+<style lang="postcss">
 :root {
  --background: 255 255 255;
  --foreground: 15 23 42;

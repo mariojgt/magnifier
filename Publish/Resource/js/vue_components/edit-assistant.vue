@@ -9,6 +9,7 @@ import {
  FolderEdit
 } from 'lucide-vue-next';
 import Toastify from 'toastify-js';
+import { toastSuccess, showHttpError } from '../utils/notify';
 import axios from 'axios';
 
 const props = defineProps({
@@ -31,22 +32,16 @@ const handleRename = async () => {
 
  try {
    isLoading.value = true;
-   await axios.post(`/folder/rename/${props.item.id}`, {
+  await axios.post(`/folder/rename/${props.item.id}`, {
      new_name: folderName.value
    });
 
    emit('load_selected_folder', props.item);
-   Toastify({
-     text: "Folder renamed successfully",
-     style: { background: "#10B981" }
-   }).showToast();
+  toastSuccess('Folder renamed successfully');
 
    isRenameModalOpen.value = false;
  } catch (error) {
-   Toastify({
-     text: "Error renaming folder",
-     style: { background: "#EF4444" }
-   }).showToast();
+   showHttpError(error, 'Error renaming folder');
  } finally {
    isLoading.value = false;
  }
@@ -55,20 +50,17 @@ const handleRename = async () => {
 const handleDelete = async () => {
  try {
    isLoading.value = true;
-   await axios.delete(`/folder/delete/${props.item.id}`);
+   const mode = (typeof localStorage !== 'undefined' && localStorage.getItem('magnifier.storage_mode')) || 'local';
+  await axios.delete(`/folder/delete/${props.item.id}`, {
+    headers: { 'X-Magnifier-Mode': mode }
+  });
 
    emit('load_selected_folder', null);
-   Toastify({
-     text: "Folder deleted successfully",
-     style: { background: "#10B981" }
-   }).showToast();
+  toastSuccess('Folder deleted successfully');
 
    isDeleteModalOpen.value = false;
  } catch (error) {
-   Toastify({
-     text: "Error deleting folder",
-     style: { background: "#EF4444" }
-   }).showToast();
+   showHttpError(error, 'Error deleting folder');
  } finally {
    isLoading.value = false;
  }

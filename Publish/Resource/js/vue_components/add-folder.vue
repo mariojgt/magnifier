@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Plus, FolderPlus, X } from 'lucide-vue-next';
 import Toastify from 'toastify-js';
+import { toastSuccess, showHttpError } from '../utils/notify';
 import axios from 'axios';
 
 const props = defineProps({
@@ -18,26 +19,19 @@ const createFolder = async () => {
 
  try {
    isLoading.value = true;
-   await axios.post("folder/create", {
+  await axios.post(`/folder/create`, {
      name: folderName.value,
      parent_id: props.parent_id,
    });
 
    emit("load_folder", { id: props.parent_id });
-   Toastify({
-     text: "Folder created successfully",
-     style: { background: "#10B981" }
-   }).showToast();
+  toastSuccess('Folder created successfully');
 
    folderName.value = '';
    isOpen.value = false;
 
  } catch (error) {
-   if (error.response?.data?.errors) {
-     Object.values(error.response.data.errors).forEach(msg =>
-       Toastify({ text: msg, style: { background: "#EF4444" } }).showToast()
-     );
-   }
+   showHttpError(error, 'Error creating folder');
  } finally {
    isLoading.value = false;
  }
