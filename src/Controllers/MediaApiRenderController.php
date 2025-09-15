@@ -22,25 +22,62 @@ class MediaApiRenderController extends Controller
 
     /**
      * Render the file or image
+     * Always tries AWS first, falls back to public storage if file doesn't exist on AWS
      *
      * @param mixed $media
      * @param bool $useFallback
      *
-     * @return [type]
+     * @return array Returns array with 'urls' and 'storage_type' keys
      */
     public function renderMediaUrlPath($media, $useFallback = false)
     {
-        // Resolve disk using per-request storage mode (header/cache/config)
-        $disk = StorageMode::diskFor(StorageMode::current());
-
-        switch ($disk) {
-            case 'public':
-                return $this->renderPublicFile($media, $useFallback);
-            case 'aws':
-                return $this->handleAwsFile($media, $useFallback);
-            default:
-                dd('upload type not allowed');
+        // First, try AWS storage
+        if ($this->fileExistsOnAws($media)) {
+            return [
+                'urls' => $this->handleAwsFile($media, $useFallback),
+                'storage_type' => 's3',
+                'is_s3' => true
+            ];
         }
+
+        // If file doesn't exist on AWS, fallback to public storage
+        return [
+            'urls' => $this->renderPublicFile($media, $useFallback),
+            'storage_type' => 'public',
+            'is_s3' => false
+        ];
+    }
+
+    /**
+     * Check if file exists on AWS S3
+     *
+     * @param mixed $media
+     * @return bool
+     */
+    protected function fileExistsOnAws($media): bool
+    {
+        // Check if any of the expected files exist on S3
+        if (in_array($media->extension, ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            // For images, check if at least one size variant exists
+            foreach (config('media.sizes') as $key => $size) {
+                $finalFile = $media->name . '.' . $media->extension;
+                $s3Key = 'media/' . trim($media->folder->path, '/') . '/' . $key . '/' . $finalFile;
+
+                if (Storage::disk('s3')->exists($s3Key)) {
+                    return true;
+                }
+            }
+        } else {
+            // For documents, check the documents folder
+            $finalFile = $media->name . '.' . $media->extension;
+            $s3Key = 'media/' . trim($media->folder->path, '/') . '/documents/' . $finalFile;
+
+            if (Storage::disk('s3')->exists($s3Key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

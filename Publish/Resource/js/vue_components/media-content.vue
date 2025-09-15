@@ -471,12 +471,23 @@ const onDrop = async (e) => {
                 'font-medium truncate',
                 selectedView === 'grid' ? 'text-white' : ''
               ]">{{ file.name }}</span>
-              <span :class="[
-                'text-sm',
-                selectedView === 'grid' ? 'text-gray-300' : 'text-gray-500'
-              ]">
-                {{ file.ext.toUpperCase() }} • {{ file.media_size }}
-              </span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span :class="[
+                  'text-sm',
+                  selectedView === 'grid' ? 'text-gray-300' : 'text-gray-500'
+                ]">
+                  {{ file.ext.toUpperCase() }} • {{ file.media_size }}
+                </span>
+                <span v-if="file.is_s3"
+                      :class="[
+                        'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium',
+                        selectedView === 'grid'
+                          ? 'bg-blue-500/20 text-blue-200 border border-blue-400/30'
+                          : 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30'
+                      ]">
+                  S3
+                </span>
+              </div>
             </div>
 
             <!-- Actions -->
