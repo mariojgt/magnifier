@@ -28,6 +28,7 @@ Route::group([
     Route::post('/file/upload/{folder}', [MediaController::class, 'upload'])->name('file.upload');
     Route::delete('/file/delete/{media}', [MediaController::class, 'mediaDelete'])->name('file.delete');
     Route::post('/file/update/{media}', [MediaController::class, 'mediaUpdate'])->name('file.update');
+
     // Global media search
     Route::get('/media/search', [MediaController::class, 'search'])->name('media.search');
 });

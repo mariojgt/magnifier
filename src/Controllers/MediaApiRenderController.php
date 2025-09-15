@@ -12,6 +12,7 @@ class MediaApiRenderController extends Controller
 {
     /** @var MediaFolderController */
     protected $folderManager;
+
     /**
      * Start the construct with the media folder controller
      */
@@ -31,6 +32,7 @@ class MediaApiRenderController extends Controller
      */
     public function renderMediaUrlPath($media, $useFallback = false)
     {
+        // Original logic (unchanged for backward compatibility)
         // First, try AWS storage
         if ($this->fileExistsOnAws($media)) {
             return [
@@ -148,7 +150,6 @@ class MediaApiRenderController extends Controller
 
         return $url;
     }
-
 
     /**
      * Render the image fallback

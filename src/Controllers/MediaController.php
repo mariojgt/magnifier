@@ -136,7 +136,7 @@ class MediaController extends Controller
             ], 422);
         }
 
-    try {
+        try {
             DB::beginTransaction();
 
             // Handle the file source and save in the media library and return the media object and the file extension
@@ -184,11 +184,11 @@ class MediaController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Media upload failed', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
             ]);
             return response()->json([
-                'message' => 'Upload failed: ' . $e->getMessage(),
+            'message' => 'Upload failed: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -464,10 +464,17 @@ class MediaController extends Controller
         // Slug the file name
         $finalFileName = Str::slug($file, '-');
 
+        // Get the resolved disk and storage type
+        $resolvedDisk = StorageMode::diskFor(StorageMode::current());
+        $storageType = $this->getStorageTypeFromDisk($resolvedDisk);
+
         // Check if the media already exist just in case
         $media = Media::where('name', $finalFileName)->first();
         if (!empty($media)) {
             $media->media_folder_id = $folder->id;
+            // Update storage type for existing media
+            $media->storage_type = $storageType;
+            $media->disk = $resolvedDisk;
             $media->save();
 
             return [
@@ -484,7 +491,8 @@ class MediaController extends Controller
         $media->extension       = $fileExtension;
         $media->media_folder_id = $folder->id;
         $media->media_size      = $fileSource->getSize();
-        $media->disk            = config('media.disk');
+        $media->disk            = $resolvedDisk;
+        $media->storage_type    = $storageType;
         $media->save();
 
         return [
@@ -492,6 +500,24 @@ class MediaController extends Controller
             'finalFileName' => $finalFileName,
             'media'         => $media,
         ];
+    }
+
+    /**
+     * Map disk name to storage type
+     *
+     * @param string $disk
+     * @return string
+     */
+    protected function getStorageTypeFromDisk($disk)
+    {
+        $mapping = [
+            'public' => 'public',
+            'local' => 'local',
+            'aws' => 's3',
+            's3' => 's3',
+        ];
+
+        return $mapping[$disk] ?? $disk;
     }
 
     /* 📁📁 HANDLE THE UPLOAD BASED IN THE TYPES END 📁📁*/
