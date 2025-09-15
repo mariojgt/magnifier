@@ -32,9 +32,7 @@ class MediaApiRenderController extends Controller
      */
     public function renderMediaUrlPath($media, $useFallback = false)
     {
-        // Original logic (unchanged for backward compatibility)
-        // First, try AWS storage
-        if ($this->fileExistsOnAws($media)) {
+        if ($media->storage_type === StorageMode::S3) {
             return [
                 'urls' => $this->handleAwsFile($media, $useFallback),
                 'storage_type' => 's3',
