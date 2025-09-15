@@ -191,11 +191,14 @@ onMounted(() => {
                  @load_selected_folder="loadSelectedFolder"
                  :breadcrumb="breadcrumb" />
 
-       <media-content :parent_id="folder_target"
-                     :view="selectedView"
-                     :search="searchQuery"
-                     @select-file="selectedFile = $event"
-                     class="flex-1">
+  <media-content :parent_id="folder_target"
+      :folders="folders"
+      :view="selectedView"
+      :search="searchQuery"
+  @open-folder="loadSelectedFolder"
+  @load-folder="reloadFolder"
+      @select-file="selectedFile = $event"
+      class="flex-1">
          <template #created>
            {{ folder_created_at }}
          </template>

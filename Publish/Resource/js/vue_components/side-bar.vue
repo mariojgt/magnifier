@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { ChevronRight, Folder, FolderOpen } from 'lucide-vue-next';
 import addFolder from './add-folder.vue';
 import editAssistant from './edit-assistant.vue';
@@ -26,6 +26,36 @@ const toggleExpand = (e) => {
     if (hasChildren.value) isExpanded.value = !isExpanded.value;
 };
 
+// Windows-like click vs double-click behavior
+const clickTimeout = ref(null);
+const handleSingleClick = () => {
+    // Select/open (existing behavior)
+    loadRequest();
+};
+const handleDoubleClick = (e) => {
+    if (hasChildren.value) {
+        if (e) e.stopPropagation();
+        isExpanded.value = !isExpanded.value;
+    } else {
+        loadRequest();
+    }
+};
+const onClick = (e) => {
+    if (clickTimeout.value) {
+        clearTimeout(clickTimeout.value);
+        clickTimeout.value = null;
+        handleDoubleClick(e);
+    } else {
+        clickTimeout.value = setTimeout(() => {
+            handleSingleClick();
+            clickTimeout.value = null;
+        }, 180);
+    }
+};
+onBeforeUnmount(() => {
+    if (clickTimeout.value) clearTimeout(clickTimeout.value);
+});
+
 const onKeydown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -48,18 +78,21 @@ const onKeydown = (e) => {
         <div class="w-full select-none">
         <!-- Row -->
         <div
-                class="relative flex items-center gap-2 rounded-md px-2 py-2 cursor-pointer group
-                             hover:bg-base-200 transition-colors focus:outline-none"
-            :style="{ paddingLeft: `${8 + level * 12}px` }"
+                class="tree-row relative flex items-center gap-2 rounded-md px-2.5 py-1.5 cursor-pointer group
+                             hover:bg-base-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            :style="{ '--level': level }"
             :title="item.name"
-                @click="loadRequest"
+                @click="onClick"
+                @dblclick.stop.prevent
                 role="treeitem"
                 tabindex="0"
+                :aria-level="level + 1"
                 :aria-expanded="hasChildren ? isExpanded : undefined"
                 :aria-selected="isActive ? 'true' : 'false'"
                 @keydown="onKeydown"
                 :class="[
                     isActive ? 'bg-base-200 ring-1 ring-primary/30' : '',
+                    level === 0 ? 'is-root' : ''
                 ]"
         >
                 <!-- Active accent bar -->
@@ -103,10 +136,10 @@ const onKeydown = (e) => {
         </div>
 
         <!-- Children -->
-        <TransitionGroup
+    <TransitionGroup
             v-if="hasChildren && isExpanded"
             tag="div"
-                    class="mt-1 space-y-1 border-l-2 border-base-300/70"
+            class="mt-1 space-y-1 border-l-2 border-base-300/60"
             enter-active-class="transition-all duration-200 ease-out"
             enter-from-class="opacity-0 -translate-y-1"
             enter-to-class="opacity-100 translate-y-0"
@@ -128,5 +161,41 @@ const onKeydown = (e) => {
 </template>
 
 <style scoped>
-/* Minimalist, nothing global needed */
+:root {
+    /* Visual baseline for tree indentation */
+    --tree-indent: 16px;
+}
+
+.tree-row {
+    /* Indent using CSS var and the provided level */
+    padding-left: calc(8px + (var(--level) * var(--tree-indent, 16px)));
+}
+
+/* Add a subtle connector elbow like Windows Explorer */
+.tree-row::before {
+    content: '';
+    position: absolute;
+    left: calc((var(--level) * var(--tree-indent, 16px)) + 4px);
+    top: 50%;
+    width: calc(var(--tree-indent, 16px) - 8px);
+    height: 0;
+    border-top: 1px solid hsl(var(--bc) / 0.25);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Don’t draw elbow on root level */
+.tree-row.is-root::before {
+    display: none;
+}
+
+/* Tighten density a bit and smooth hover */
+.tree-row:hover {
+    background-image: linear-gradient(hsl(var(--b2) / 0.4), hsl(var(--b2) / 0.4));
+}
+
+/* Ensure truncation remains clean */
+.tree-row .truncate {
+    max-width: 100%;
+}
 </style>

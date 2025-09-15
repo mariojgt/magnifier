@@ -6,7 +6,7 @@ import { toast, toastError, toastSuccess, showHttpError } from '../utils/notify'
 import {
  LayoutGrid, List, Upload, File, Image, FolderPlus,
  Search, Download, FileEdit, Folder, Settings, Film,
- Music, FileText
+ Music, FileText, ChevronRight
 } from 'lucide-vue-next';
 import imageEdit from './media/image-edit.vue';
 import editMedia from './edit-assistant-media.vue';
@@ -14,6 +14,14 @@ import axios from 'axios';
 
 const props = defineProps({
  parent_id: Number,
+ folders: {
+   type: Array,
+   default: () => []
+ },
+ view: {
+   type: String,
+   default: 'grid'
+ },
  extension: {
    type: Array,
    default: () => ["jpeg", "jpg", "png", "gif", "webp"]
@@ -25,11 +33,14 @@ const props = defineProps({
 });
 
 // State
-const emit = defineEmits(['select-file']);
+const emit = defineEmits(['select-file', 'open-folder', 'load-folder']);
 const files = ref([]);
 const uploadModalOpen = ref(false);
 const isLoading = ref(false);
 const selectedView = ref('grid');
+watch(() => props.view, (v) => {
+  selectedView.value = v === 'list' ? 'list' : 'grid';
+}, { immediate: true });
 const selectedFile = ref(null);
 const dragActive = ref(false);
 const dragCounter = ref(0);
@@ -38,6 +49,13 @@ const searchQuery = ref('');
 let searchTimer = null;
 const sortBy = ref('name'); // name, date, size
 const sortOrder = ref('asc');
+
+// Context menu state
+const folderMenu = ref({ open: false, x: 0, y: 0, item: null });
+const bgMenu = ref({ open: false, x: 0, y: 0 });
+const renameModal = ref({ open: false, name: '' });
+const newFolderModal = ref({ open: false, name: '' });
+const busy = ref(false);
 
 // Notifications
 const showToast = (message, type = 'info') => toast(message, type);
@@ -107,6 +125,86 @@ const filteredFiles = computed(() => {
    file.ext.toLowerCase().includes(query)
  );
 });
+
+// Folders filtering (by name) sorted first by name asc
+const filteredFolders = computed(() => {
+  const list = Array.isArray(props.folders) ? props.folders : [];
+  const q = (searchQuery.value || '').toLowerCase();
+  const base = q ? list.filter(f => String(f.name || '').toLowerCase().includes(q)) : list;
+  return [...base].sort((a,b) => String(a.name||'').localeCompare(String(b.name||'')));
+});
+
+const openFolder = (folder) => emit('open-folder', folder);
+
+// Context menu helpers
+const hideMenus = () => {
+  folderMenu.value.open = false;
+  bgMenu.value.open = false;
+};
+const onFolderContextMenu = (e, folder) => {
+  e.preventDefault();
+  e.stopPropagation();
+  hideMenus();
+  folderMenu.value = { open: true, x: e.clientX, y: e.clientY, item: folder };
+};
+const onBackgroundContextMenu = (e) => {
+  // Avoid opening if a folder tile handled the event
+  if (e.defaultPrevented) return;
+  e.preventDefault();
+  hideMenus();
+  bgMenu.value = { open: true, x: e.clientX, y: e.clientY };
+};
+
+// Actions
+const doRename = async () => {
+  const item = folderMenu.value.item;
+  if (!item || !renameModal.value.name) return;
+  try {
+    busy.value = true;
+    await axios.post(`/folder/rename/${item.id}`, { new_name: renameModal.value.name });
+    toastSuccess('Folder renamed successfully');
+    emit('load-folder', props.parent_id ? { id: props.parent_id } : null);
+  } catch (error) {
+    showHttpError(error, 'Error renaming folder');
+  } finally {
+    busy.value = false;
+    renameModal.value.open = false;
+    hideMenus();
+  }
+};
+
+const doDelete = async () => {
+  const item = folderMenu.value.item;
+  if (!item) return;
+  try {
+    busy.value = true;
+    const mode = (typeof localStorage !== 'undefined' && localStorage.getItem('magnifier.storage_mode')) || 'local';
+    await axios.delete(`/folder/delete/${item.id}`, { headers: { 'X-Magnifier-Mode': mode } });
+    toastSuccess('Folder deleted successfully');
+    emit('load-folder', props.parent_id ? { id: props.parent_id } : null);
+  } catch (error) {
+    showHttpError(error, 'Error deleting folder');
+  } finally {
+    busy.value = false;
+    hideMenus();
+  }
+};
+
+const doCreateFolder = async () => {
+  if (!newFolderModal.value.name) return;
+  try {
+    busy.value = true;
+    await axios.post(`/folder/create`, { name: newFolderModal.value.name, parent_id: props.parent_id });
+    toastSuccess('Folder created successfully');
+    emit('load-folder', props.parent_id ? { id: props.parent_id } : null);
+  } catch (error) {
+    showHttpError(error, 'Error creating folder');
+  } finally {
+    busy.value = false;
+    newFolderModal.value.open = false;
+    bgMenu.value.open = false;
+  }
+};
 
 // Upload handling
 const upload = {
@@ -283,7 +381,7 @@ const onDrop = async (e) => {
       </div>
 
       <!-- Content -->
-      <div class="p-6">
+      <div class="p-6" @contextmenu="onBackgroundContextMenu">
         <TransitionGroup
           tag="div"
           :class="[
@@ -293,7 +391,7 @@ const onDrop = async (e) => {
           ]"
           name="file-grid">
 
-          <!-- Upload Card (Grid only) -->
+    <!-- Upload Card (Grid only) -->
           <div v-if="selectedView === 'grid'"
                key="upload"
                @click="uploadModalOpen = true"
@@ -308,6 +406,34 @@ const onDrop = async (e) => {
             </div>
             <span class="text-sm font-medium">Upload Files</span>
             <span class="text-xs text-gray-500 mt-1">or drag and drop</span>
+          </div>
+
+          <!-- Folder Items (show before files) -->
+    <div v-for="folder in filteredFolders"
+               :key="`folder-${folder.id}`"
+      @click="openFolder(folder)"
+      @contextmenu.prevent="onFolderContextMenu($event, folder)"
+               class="group relative bg-gray-50 dark:bg-gray-800 rounded-xl
+                      overflow-hidden cursor-pointer"
+               :class="[
+                 selectedView === 'grid' ? 'aspect-square p-4' : 'flex items-center p-3'
+               ]">
+            <div :class="selectedView === 'grid' ? 'w-12 h-12 mb-3' : 'w-6 h-6'">
+              <Folder class="w-full h-full text-yellow-500" />
+            </div>
+            <div :class="[
+              'min-w-0',
+              selectedView === 'grid' ? '' : 'ml-3 flex-1'
+            ]">
+              <div class="truncate font-medium">
+                {{ folder.name }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ folder.count || 0 }} items
+              </div>
+            </div>
+            <ChevronRight v-if="selectedView === 'list'"
+                           class="w-4 h-4 ml-auto text-gray-400" />
           </div>
 
           <!-- File Items -->
@@ -387,6 +513,63 @@ const onDrop = async (e) => {
           </p>
         </div>
       </div>
+
+      <!-- Context Menus -->
+      <Teleport to="body">
+        <!-- Backdrop for closing menus -->
+        <div v-if="folderMenu.open || bgMenu.open"
+             class="fixed inset-0 z-40" @click="hideMenus" />
+
+        <!-- Folder menu -->
+        <div v-if="folderMenu.open"
+             class="fixed z-50 w-48 rounded-md shadow-lg ring-1 ring-black/10 bg-base-100"
+             :style="{ left: folderMenu.x + 'px', top: folderMenu.y + 'px' }">
+          <button class="w-full text-left px-3 py-2 hover:bg-base-200"
+                  @click="openFolder(folderMenu.item); hideMenus()">Open</button>
+          <button class="w-full text-left px-3 py-2 hover:bg-base-200"
+                  @click="renameModal = { open: true, name: folderMenu.item?.name || '' }">Rename</button>
+          <button class="w-full text-left px-3 py-2 text-error hover:bg-error/10"
+                  @click="doDelete">Delete</button>
+        </div>
+
+        <!-- Background menu -->
+        <div v-if="bgMenu.open"
+             class="fixed z-50 w-48 rounded-md shadow-lg ring-1 ring-black/10 bg-base-100"
+             :style="{ left: bgMenu.x + 'px', top: bgMenu.y + 'px' }">
+          <button class="w-full text-left px-3 py-2 hover:bg-base-200"
+                  @click="newFolderModal = { open: true, name: '' }">New Folder</button>
+        </div>
+
+        <!-- Rename Modal -->
+        <div v-if="renameModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" @click="renameModal.open = false" />
+          <div class="relative bg-base-100 rounded-2xl w-full max-w-sm shadow-xl">
+            <div class="p-4 border-b border-base-200 font-semibold">Rename Folder</div>
+            <div class="p-4">
+              <input class="input input-bordered w-full" v-model="renameModal.name" @keyup.enter="doRename" placeholder="Enter new name" />
+            </div>
+            <div class="flex justify-end gap-2 p-4 border-t border-base-200">
+              <button class="btn btn-ghost" @click="renameModal.open = false">Cancel</button>
+              <button class="btn btn-primary" :disabled="!renameModal.name || busy" @click="doRename">Rename</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Folder Modal -->
+        <div v-if="newFolderModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" @click="newFolderModal.open = false" />
+          <div class="relative bg-base-100 rounded-2xl w-full max-w-sm shadow-xl">
+            <div class="p-4 border-b border-base-200 font-semibold">New Folder</div>
+            <div class="p-4">
+              <input class="input input-bordered w-full" v-model="newFolderModal.name" @keyup.enter="doCreateFolder" placeholder="Enter folder name" />
+            </div>
+            <div class="flex justify-end gap-2 p-4 border-t border-base-200">
+              <button class="btn btn-ghost" @click="newFolderModal.open = false">Cancel</button>
+              <button class="btn btn-primary" :disabled="!newFolderModal.name || busy" @click="doCreateFolder">Create</button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
       <!-- Modal and Overlays -->
   <div v-if="dragActive"
