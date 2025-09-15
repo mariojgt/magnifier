@@ -1,11 +1,11 @@
 {
   "resources/vendor/Magnifier/js/vue.js": {
-    "file": "assets/vue-B7cJ9cR1.js",
+    "file": "assets/vue-BOEnhXQa.js",
     "name": "vue",
     "src": "resources/vendor/Magnifier/js/vue.js",
     "isEntry": true,
     "css": [
-      "assets/vue-CHjEVvnU.css"
+      "assets/vue-BOxQQ0Wv.css"
     ]
   },
   "resources/vendor/Magnifier/sass/app.scss": {

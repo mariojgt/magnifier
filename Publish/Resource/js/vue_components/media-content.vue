@@ -216,7 +216,10 @@ const upload = {
    const formData = new FormData();
    formData.append("file", file);
    try {
-     await axios.post(`/file/upload/${props.parent_id}`, formData);
+     const mode = (typeof localStorage !== 'undefined' && localStorage.getItem('magnifier.storage_mode')) || 'local';
+     await axios.post(`/file/upload/${props.parent_id}`, formData, {
+       headers: { 'X-Magnifier-Mode': mode }
+     });
      toastSuccess('File uploaded successfully');
    } catch (error) {
      showHttpError(error, 'The file failed to upload.');
