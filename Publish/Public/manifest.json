@@ -1,17 +1,18 @@
 {
   "resources/vendor/Magnifier/js/vue.js": {
-    "file": "assets/vue-BOEnhXQa.js",
+    "file": "assets/vue-2S6JE0LB.js",
     "name": "vue",
     "src": "resources/vendor/Magnifier/js/vue.js",
     "isEntry": true,
     "css": [
-      "assets/vue-BOxQQ0Wv.css"
+      "assets/vue-6TghAQYf.css"
     ]
   },
   "resources/vendor/Magnifier/sass/app.scss": {
-    "file": "assets/css-BKKemi5w.css",
+    "file": "assets/css-BUjvGasR.css",
     "src": "resources/vendor/Magnifier/sass/app.scss",
     "isEntry": true,
+    "name": "css",
     "names": [
       "css.css"
     ]

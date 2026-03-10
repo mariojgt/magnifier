@@ -41,8 +41,8 @@ const createFolder = async () => {
 <template>
  <div>
    <button @click="isOpen = true"
-           class="btn btn-ghost btn-circle hover:bg-primary/10">
-     <Plus class="w-5 h-5 text-primary" />
+           class="btn btn-ghost btn-circle btn-xs hover:bg-primary/10">
+     <Plus class="w-3.5 h-3.5 text-primary" />
    </button>
 
    <Teleport to="body">

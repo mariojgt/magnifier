@@ -17,58 +17,40 @@ const loadFolder = (item) => emit('load_selected_folder', item);
 </script>
 
 <template>
- <nav class="flex items-center py-2 px-4 bg-base-200/50 backdrop-blur
-             rounded-lg shadow-sm overflow-x-auto">
+ <nav class="flex items-center py-1.5 px-3 bg-gray-50/80 dark:bg-gray-800/40
+             border-b border-gray-100 dark:border-gray-700/50 overflow-x-auto">
    <!-- Home -->
    <button @click="loadParents"
-           @mouseenter="hoveredIndex = -1"
-           @mouseleave="hoveredIndex = null"
-           class="flex items-center min-w-fit px-2 py-1 rounded-md
-                  transition-all duration-200 hover:bg-primary/10
-                  relative group">
-     <Home class="w-4 h-4 text-primary" />
-     <span class="ml-2 text-sm font-medium">Home</span>
-
-     <div v-if="hoveredIndex === -1"
-          class="absolute inset-0 border-2 border-primary/30
-                 rounded-md scale-105 animate-pulse"/>
+           class="flex items-center min-w-fit px-1.5 py-0.5 rounded-md text-[13px]
+                  transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+     <Home class="w-3.5 h-3.5 text-gray-500" />
+     <span class="ml-1.5 font-medium text-gray-600 dark:text-gray-400">Home</span>
    </button>
 
    <!-- Separator after home -->
    <ChevronRight v-if="breadcrumb?.length"
-                 class="w-4 h-4 mx-2 text-base-content/30" />
+                 class="w-3 h-3 mx-1 text-gray-300 dark:text-gray-600 shrink-0" />
 
    <!-- Breadcrumb items -->
-   <div class="flex items-center space-x-2 overflow-x-auto">
+   <div class="flex items-center gap-0.5 overflow-x-auto">
      <template v-for="(item, index) in breadcrumb" :key="index">
        <button @click="loadFolder(item)"
-               @mouseenter="hoveredIndex = index"
-               @mouseleave="hoveredIndex = null"
-               class="flex items-center min-w-fit px-2 py-1 rounded-md
-                      transition-all duration-200 hover:bg-primary/10
-                      relative group whitespace-nowrap">
-         <Folder class="w-4 h-4 text-primary/70 mr-2" />
-         <span class="text-sm font-medium">{{ item.name }}</span>
-
-         <div v-if="hoveredIndex === index"
-              class="absolute inset-0 border-2 border-primary/30
-                     rounded-md scale-105 animate-pulse"/>
+               class="flex items-center min-w-fit px-1.5 py-0.5 rounded-md text-[13px]
+                      transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-700/50
+                      whitespace-nowrap"
+               :class="index === breadcrumb.length - 1
+                 ? 'text-gray-900 dark:text-gray-100 font-medium'
+                 : 'text-gray-500 dark:text-gray-400'">
+         <Folder class="w-3.5 h-3.5 mr-1.5 text-gray-400" />
+         <span>{{ item.name }}</span>
        </button>
 
        <ChevronRight v-if="index < breadcrumb.length - 1"
-                    class="w-4 h-4 text-base-content/30 shrink-0" />
+                    class="w-3 h-3 text-gray-300 dark:text-gray-600 shrink-0" />
      </template>
    </div>
  </nav>
 </template>
 
 <style scoped>
-.animate-pulse {
- animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
- 0%, 100% { opacity: 1; }
- 50% { opacity: .5; }
-}
 </style>

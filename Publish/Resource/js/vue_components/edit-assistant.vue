@@ -71,8 +71,8 @@ const handleDelete = async () => {
  <div class="relative">
    <!-- Menu Trigger -->
    <button @click="isMenuOpen = !isMenuOpen"
-           class="btn btn-ghost btn-circle btn-sm">
-     <MoreVertical class="w-4 h-4" />
+           class="btn btn-ghost btn-circle btn-xs">
+     <MoreVertical class="w-3 h-3" />
    </button>
 
    <!-- Dropdown Menu -->
